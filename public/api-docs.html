@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Documentation - ThuruvanPay Payment Gateway</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <span class="text-xl font-black text-slate-900 tracking-tight">Thuruvan<span class="text-indigo-600">Pay</span></span>
+        </a>
+        <span class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-md">REST API v1</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <a href="/dashboard.html" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition">
+          Merchant Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-8 flex-1">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-full lg:w-64 space-y-1 text-sm font-medium text-slate-600 shrink-0">
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Getting Started</p>
+      <a href="#overview" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition">Overview</a>
+      <a href="#authentication" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition">Authentication</a>
+      
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Endpoints</p>
+      <a href="#create-order" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition flex items-center justify-between">
+        <span>Create Order</span>
+        <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">POST</span>
+      </a>
+      <a href="#check-order" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition flex items-center justify-between">
+        <span>Check Status</span>
+        <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">POST</span>
+      </a>
+      <a href="#webhooks" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition flex items-center justify-between">
+        <span>Webhook Callback</span>
+        <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">HOOK</span>
+      </a>
+
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Tools</p>
+      <a href="#api-tester" class="block px-3 py-2 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition text-indigo-600 font-bold">
+        <i class="fa-solid fa-play text-xs mr-1"></i> Live API Tester
+      </a>
+    </aside>
+
+    <!-- Main Docs Content -->
+    <main class="flex-1 space-y-12 max-w-4xl">
+      
+      <!-- Section: Overview -->
+      <section id="overview" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <h1 class="text-3xl font-extrabold text-slate-900">ThuruvanPay Developer API</h1>
+        <p class="text-slate-600 leading-relaxed text-sm">
+          Integrate lightning-fast UPI payment collections into any website, mobile application, or billing portal. 
+          Our REST API generates Dynamic NPCI-compliant UPI QR codes and app-to-app UPI intent triggers that settle funds directly to your verified UPI VPA.
+        </p>
+
+        <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex items-start gap-3">
+          <i class="fa-solid fa-circle-info text-indigo-600 mt-0.5"></i>
+          <div class="text-xs text-indigo-900 leading-relaxed">
+            <span class="font-bold">Base URL:</span> 
+            <code class="bg-white px-2 py-1 rounded text-indigo-700 font-mono text-[11px] border border-indigo-200">http://localhost:5000/api</code>
+            (In production, replace with your live domain: <code class="bg-white px-2 py-1 rounded text-indigo-700 font-mono text-[11px] border border-indigo-200">https://pay.yourdomain.com/api</code>).
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Authentication -->
+      <section id="authentication" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900">Authentication</h2>
+        <p class="text-slate-600 text-sm">
+          All API requests must include your merchant credentials in the HTTP request headers:
+        </p>
+
+        <div class="bg-slate-900 text-slate-100 p-4 rounded-2xl text-xs overflow-x-auto">
+          <code>
+            x-api-key: key_your_unique_merchant_api_key<br>
+            x-api-secret: sec_your_unique_merchant_api_secret<br>
+            Content-Type: application/json
+          </code>
+        </div>
+        <p class="text-xs text-slate-500">You can find your API credentials directly in your <a href="/dashboard.html" class="text-indigo-600 underline font-bold">Merchant Dashboard</a>.</p>
+      </section>
+
+      <!-- Section: Create Order -->
+      <section id="create-order" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-md">POST</span>
+            <code class="text-sm font-bold text-slate-900">/api/create-order</code>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900">Create Payment Order</h2>
+          <p class="text-slate-600 text-sm mt-1">Initiates a transaction and returns dynamic QR code data alongside direct UPI app intent URLs.</p>
+        </div>
+
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Request Body (JSON)</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-slate-400 font-bold uppercase">
+                <th class="py-2.5">Field</th>
+                <th class="py-2.5">Type</th>
+                <th class="py-2.5">Required</th>
+                <th class="py-2.5">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-2.5 font-mono text-indigo-600 font-bold">amount</td>
+                <td class="py-2.5 text-slate-500">Number</td>
+                <td class="py-2.5"><span class="text-emerald-600 font-bold">Yes</span></td>
+                <td class="py-2.5">Amount in Indian Rupees (e.g., 299.00)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-mono text-indigo-600 font-bold">customer_name</td>
+                <td class="py-2.5 text-slate-500">String</td>
+                <td class="py-2.5"><span class="text-slate-400 font-bold">Optional</span></td>
+                <td class="py-2.5">Name of the paying customer</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-mono text-indigo-600 font-bold">customer_mobile</td>
+                <td class="py-2.5 text-slate-500">String</td>
+                <td class="py-2.5"><span class="text-slate-400 font-bold">Optional</span></td>
+                <td class="py-2.5">10-digit mobile number</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-mono text-indigo-600 font-bold">redirect_url</td>
+                <td class="py-2.5 text-slate-500">String</td>
+                <td class="py-2.5"><span class="text-slate-400 font-bold">Optional</span></td>
+                <td class="py-2.5">URL to redirect customer upon payment completion</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 font-mono text-indigo-600 font-bold">webhook_url</td>
+                <td class="py-2.5 text-slate-500">String</td>
+                <td class="py-2.5"><span class="text-slate-400 font-bold">Optional</span></td>
+                <td class="py-2.5">Custom webhook listener for this specific order</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Code Examples (Tabs) -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Integration Examples</h4>
+          
+          <div class="bg-slate-900 rounded-2xl p-5 text-slate-200 text-xs overflow-x-auto space-y-4">
+            <p class="text-slate-400 font-mono text-[11px]">// 1. PHP cURL Example (Just like MugavaiGroups / ZapUPI)</p>
+            <pre><code>&lt;?php
+$apiKey = "YOUR_API_KEY";
+$apiSecret = "YOUR_API_SECRET";
+
+$data = [
+    "amount" =&gt; 500,
+    "customer_name" =&gt; "Ramesh Kumar",
+    "customer_mobile" =&gt; "9876543210",
+    "redirect_url" =&gt; "https://yoursite.com/order-success.php"
+];
+
+$ch = curl_init("http://localhost:5000/api/create-order");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/json",
+    "x-api-key: " . $apiKey,
+    "x-api-secret: " . $apiSecret
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$result = json_decode($response, true);
+if ($result["status"]) {
+    // Redirect user to payment checkout page:
+    header("Location: " . $result["data"]["payment_url"]);
+    exit;
+}
+?&gt;</code></pre>
+          </div>
+        </div>
+
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Response Sample</h4>
+        <div class="bg-slate-900 rounded-2xl p-5 text-emerald-400 text-xs overflow-x-auto">
+          <pre><code>{
+  "status": true,
+  "message": "Order created successfully",
+  "data": {
+    "order_id": "ORD_1728471928_4921",
+    "amount": 500,
+    "currency": "INR",
+    "upi_vpa": "mybusiness@paytm",
+    "payment_url": "http://localhost:5000/checkout.html?order_id=ORD_1728471928_4921",
+    "upi_intent": "upi://pay?pa=mybusiness@paytm&pn=Store&am=500.00&cu=INR&tr=ORD_1728471928_4921",
+    "qr_code": "data:image/png;base64,iVBORw0KGgo...",
+    "created_at": "2026-10-09T18:50:00.000Z"
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: Check Order Status -->
+      <section id="check-order" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded-md">POST</span>
+          <code class="text-sm font-bold text-slate-900">/api/check-order-status</code>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900">Check Order Status</h2>
+        <p class="text-slate-600 text-sm">Query transaction status programmatically using Order ID.</p>
+
+        <div class="bg-slate-900 text-slate-200 p-4 rounded-2xl text-xs overflow-x-auto">
+          <pre><code>curl -X POST http://localhost:5000/api/check-order-status \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "x-api-secret: YOUR_API_SECRET" \
+  -d '{"order_id": "ORD_1728471928_4921"}'</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: Webhooks -->
+      <section id="webhooks" class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900">Webhook Callbacks</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          When a customer pays, our gateway triggers an HTTP POST request to your webhook URL.
+          The request contains the signature in the <code class="bg-slate-100 text-indigo-700 px-1 rounded font-mono">X-Gateway-Signature</code> header.
+        </p>
+
+        <div class="bg-slate-900 text-slate-200 p-5 rounded-2xl text-xs overflow-x-auto space-y-3">
+          <p class="text-slate-400 font-mono">// PHP Webhook Listener (`webhook.php` on your website)</p>
+          <pre><code>&lt;?php
+$apiSecret = "YOUR_API_SECRET";
+$input = file_get_contents("php://input");
+$receivedSig = $_SERVER["HTTP_X_GATEWAY_SIGNATURE"] ?? "";
+
+// Verify authenticity with HMAC-SHA256
+$computedSig = hash_hmac("sha256", $input, $apiSecret);
+
+if (hash_equals($computedSig, $receivedSig)) {
+    $data = json_decode($input, true);
+    if ($data["status"] === "SUCCESS") {
+        $orderId = $data["order_id"];
+        $amount = $data["amount"];
+        $utr = $data["utr"]; // 12-digit Bank UTR
+
+        // Update your database here!
+    }
+    http_response_code(200);
+    echo json_encode(["status" =&gt; "ok"]);
+} else {
+    http_response_code(403);
+    echo "Invalid Signature";
+}
+?&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- Interactive API Tester -->
+      <section id="api-tester" class="bg-white p-8 rounded-3xl border border-indigo-200 shadow-lg space-y-4">
+        <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-terminal text-indigo-600"></i> Interactive Live API Tester
+        </h2>
+        <p class="text-slate-500 text-xs">Test the API directly from this browser page!</p>
+
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input type="text" id="test-key" placeholder="Enter API Key" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono">
+            <input type="password" id="test-secret" placeholder="Enter API Secret" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono">
+          </div>
+          <div class="flex gap-3">
+            <input type="number" id="test-amount-val" value="25.00" step="1" placeholder="Amount (INR)" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs w-36 font-bold">
+            <button onclick="runApiTest()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition">
+              Send Test API Request
+            </button>
+          </div>
+
+          <div id="api-test-output" class="hidden bg-slate-950 text-slate-300 p-4 rounded-2xl text-xs font-mono overflow-x-auto max-h-64"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    async function runApiTest() {
+      const apiKey = document.getElementById('test-key').value;
+      const apiSecret = document.getElementById('test-secret').value;
+      const amount = document.getElementById('test-amount-val').value;
+      const output = document.getElementById('api-test-output');
+
+      output.classList.remove('hidden');
+      output.textContent = 'Sending request to /api/create-order...';
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'x-api-secret': apiSecret
+          },
+          body: JSON.stringify({ amount: parseFloat(amount), customer_name: 'Console Tester' })
+        });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        output.textContent = 'Error: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>

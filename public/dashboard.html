@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Portal - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <span class="text-xl font-black text-slate-900 tracking-tight">Thuruvan<span class="text-indigo-600">Pay</span></span>
+        </a>
+        <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">Merchant Console</span>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <a href="/api-docs.html" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-file-code text-indigo-500"></i> API Docs
+        </a>
+        <button onclick="openTestModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2">
+          <i class="fa-solid fa-qrcode"></i> Test Payment QR
+        </button>
+        <div class="h-6 w-px bg-slate-200"></div>
+        <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:text-rose-700 transition flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+
+    <!-- Welcome & Top Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-black text-slate-900">Welcome, <span id="merchant-name" class="text-indigo-600">Merchant</span></h1>
+        <p class="text-xs text-slate-500 mt-0.5" id="merchant-email">loading credentials...</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Gateway Active
+        </span>
+        <button onclick="loadDashboard()" class="p-2 text-slate-400 hover:text-slate-600 transition text-sm" title="Refresh">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- Total Collected -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Collected</p>
+        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-revenue">₹0.00</p>
+        <p class="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+          <i class="fa-solid fa-circle-check"></i> Settle Direct to Bank
+        </p>
+      </div>
+
+      <!-- Successful Orders -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Completed Orders</p>
+        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-success">0</p>
+        <p class="text-xs text-slate-500 font-medium mt-1">Verified transactions</p>
+      </div>
+
+      <!-- Pending Orders -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Pending Orders</p>
+        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-pending">0</p>
+        <p class="text-xs text-amber-600 font-medium mt-1">Awaiting customer payment</p>
+      </div>
+
+      <!-- Total Created -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Initiated</p>
+        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-total">0</p>
+        <p class="text-xs text-indigo-600 font-medium mt-1">All time orders created</p>
+      </div>
+    </div>
+
+    <!-- Two Column Layout: API Keys & UPI Settings -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- API Credentials Card -->
+      <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-key text-indigo-600"></i> API Credentials
+            </h3>
+            <button onclick="regenerateKeys()" class="text-xs font-semibold text-rose-600 hover:text-rose-700 transition">
+              <i class="fa-solid fa-arrows-rotate mr-1"></i> Roll Keys
+            </button>
+          </div>
+          <p class="text-xs text-slate-500 mb-5">Pass these in the <code class="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono">x-api-key</code> and <code class="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono">x-api-secret</code> headers.</p>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">API Key</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="api-key-input" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-700 select-all">
+                <button onclick="copyToClipboard('api-key-input')" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">API Secret</label>
+              <div class="flex items-center gap-2">
+                <input type="password" id="api-secret-input" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-700 select-all">
+                <button onclick="toggleSecretVisibility()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
+                  <i id="secret-eye-icon" class="fa-regular fa-eye"></i>
+                </button>
+                <button onclick="copyToClipboard('api-secret-input')" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <a href="/api-docs.html" class="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
+            <span>Read full API documentation & code examples</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Merchant UPI Configuration -->
+      <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-900 mb-1 flex items-center gap-2">
+          <i class="fa-solid fa-gear text-emerald-600"></i> UPI Gateway Settings
+        </h3>
+        <p class="text-xs text-slate-500 mb-5">Configure where customer payments and webhook events are directed.</p>
+
+        <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Receiver UPI VPA</label>
+            <input type="text" id="setting-upi-vpa" required placeholder="example@paytm / business@okaxis" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+            <p class="text-[11px] text-slate-400 mt-1">This UPI ID is embedded inside every QR code generated.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Merchant Display Name</label>
+            <input type="text" id="setting-upi-name" required placeholder="Your Store / Brand Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Webhook URL (Payment Callback)</label>
+            <input type="url" id="setting-webhook-url" placeholder="https://yourwebsite.com/api/payment-webhook" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
+            <p class="text-[11px] text-slate-400 mt-1">We will send an HTTP POST event whenever an order is marked SUCCESS.</p>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btn-save-settings" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-200 transition">
+              Save Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Recent Transactions Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-slate-900">Recent Transactions</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Real-time payment order history and UTR references</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 text-slate-400 uppercase font-bold tracking-wider border-b border-slate-100">
+              <th class="p-4">Order ID</th>
+              <th class="p-4">Customer</th>
+              <th class="p-4">Amount</th>
+              <th class="p-4">Status</th>
+              <th class="p-4">UTR Number</th>
+              <th class="p-4">Date / Time</th>
+              <th class="p-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-tbody" class="divide-y divide-slate-100 text-slate-700">
+            <tr>
+              <td colspan="7" class="p-8 text-center text-slate-400">Loading transactions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal: Test Payment Order -->
+  <div id="test-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-900 text-base">Generate Test Payment</h3>
+        <button onclick="closeTestModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <p class="text-xs text-slate-500">Test the dynamic QR checkout page using your configured UPI settings.</p>
+
+      <form onsubmit="generateTestOrder(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Amount (INR ₹)</label>
+          <input type="number" id="test-amount" value="10.00" step="1" min="1" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Customer Name</label>
+          <input type="text" id="test-cust-name" value="Test Customer" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+        </div>
+
+        <button type="submit" id="btn-create-test" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Launch Checkout Page
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    let currentMerchant = null;
+
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/auth/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          logout();
+          return;
+        }
+
+        const data = await res.json();
+        if (data.status) {
+          currentMerchant = data.merchant;
+          document.getElementById('merchant-name').textContent = currentMerchant.name;
+          document.getElementById('merchant-email').textContent = currentMerchant.email;
+
+          document.getElementById('stat-revenue').textContent = `₹${data.stats.totalRevenue.toFixed(2)}`;
+          document.getElementById('stat-success').textContent = data.stats.successOrders;
+          document.getElementById('stat-pending').textContent = data.stats.pendingOrders;
+          document.getElementById('stat-total').textContent = data.stats.totalOrders;
+
+          document.getElementById('api-key-input').value = currentMerchant.api_key;
+          document.getElementById('api-secret-input').value = currentMerchant.api_secret;
+
+          document.getElementById('setting-upi-vpa').value = currentMerchant.upi_vpa || '';
+          document.getElementById('setting-upi-name').value = currentMerchant.upi_name || '';
+          document.getElementById('setting-webhook-url').value = currentMerchant.webhook_url || '';
+
+          renderTransactions(data.recentOrders);
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
+      }
+    }
+
+    function renderTransactions(orders) {
+      const tbody = document.getElementById('transactions-tbody');
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No orders created yet. Click "Test Payment QR" to create one!</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => {
+        const isSuccess = o.status === 'SUCCESS';
+        const badge = isSuccess
+          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">SUCCESS</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">PENDING</span>`;
+
+        return `
+          <tr class="hover:bg-slate-50/70 transition">
+            <td class="p-4 font-mono font-semibold text-slate-900">${o.order_id}</td>
+            <td class="p-4">${o.customer_name || 'N/A'}</td>
+            <td class="p-4 font-bold text-slate-900">₹${parseFloat(o.amount).toFixed(2)}</td>
+            <td class="p-4">${badge}</td>
+            <td class="p-4 font-mono text-slate-600">${o.utr || '-'}</td>
+            <td class="p-4 text-slate-400">${new Date(o.created_at).toLocaleString()}</td>
+            <td class="p-4 text-right">
+              <a href="/checkout.html?order_id=${o.order_id}" target="_blank" class="px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg font-semibold transition">
+                Pay Link
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function saveSettings(e) {
+      e.preventDefault();
+      const upi_vpa = document.getElementById('setting-upi-vpa').value;
+      const upi_name = document.getElementById('setting-upi-name').value;
+      const webhook_url = document.getElementById('setting-webhook-url').value;
+      const btn = document.getElementById('btn-save-settings');
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/auth/settings', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ upi_vpa, upi_name, webhook_url })
+        });
+        const d = await res.json();
+        alert(d.message);
+      } catch (e) {
+        alert('Failed to save settings.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+      }
+    }
+
+    async function regenerateKeys() {
+      if (!confirm('Are you sure you want to regenerate your API keys? Any active integrations using current keys will stop working.')) return;
+
+      try {
+        const res = await fetch('/auth/regenerate-keys', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const d = await res.json();
+        if (d.status) {
+          document.getElementById('api-key-input').value = d.api_key;
+          document.getElementById('api-secret-input').value = d.api_secret;
+          alert('New API Key & Secret generated!');
+        }
+      } catch (e) {
+        alert('Key roll failed');
+      }
+    }
+
+    function toggleSecretVisibility() {
+      const input = document.getElementById('api-secret-input');
+      const icon = document.getElementById('secret-eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    function copyToClipboard(inputId) {
+      const input = document.getElementById(inputId);
+      navigator.clipboard.writeText(input.value);
+      alert('Copied to clipboard!');
+    }
+
+    function openTestModal() {
+      document.getElementById('test-modal').classList.remove('hidden');
+    }
+
+    function closeTestModal() {
+      document.getElementById('test-modal').classList.add('hidden');
+    }
+
+    async function generateTestOrder(e) {
+      e.preventDefault();
+      const amount = document.getElementById('test-amount').value;
+      const customer_name = document.getElementById('test-cust-name').value;
+      const apiKey = document.getElementById('api-key-input').value;
+      const apiSecret = document.getElementById('api-secret-input').value;
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'x-api-secret': apiSecret
+          },
+          body: JSON.stringify({
+            amount: parseFloat(amount),
+            customer_name,
+            redirect_url: window.location.href
+          })
+        });
+
+        const d = await res.json();
+        if (d.status) {
+          window.open(d.data.payment_url, '_blank');
+          closeTestModal();
+          setTimeout(loadDashboard, 1500);
+        } else {
+          alert(d.message || 'Error generating test order');
+        }
+      } catch (err) {
+        alert('Failed to connect to order API');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

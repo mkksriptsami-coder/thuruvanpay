@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Control Center - ThuruvanPay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- Top Navigation -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-rose-950">
+          <i class="fa-solid fa-crown text-sm"></i>
+        </div>
+        <span class="text-lg font-black tracking-tight text-white">Thuruvan<span class="text-indigo-400">Pay</span></span>
+        <span class="text-[10px] bg-rose-950/80 text-rose-300 border border-rose-800 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Super Admin</span>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 text-xs font-bold text-slate-400">
+        <button onclick="switchTab('overview')" id="nav-overview" class="px-3.5 py-2 rounded-xl text-white bg-slate-800 transition">
+          <i class="fa-solid fa-chart-pie mr-1.5 text-indigo-400"></i> Overview
+        </button>
+        <button onclick="switchTab('merchants')" id="nav-merchants" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-users-gear mr-1.5 text-emerald-400"></i> Merchants
+        </button>
+        <button onclick="switchTab('transactions')" id="nav-transactions" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-receipt mr-1.5 text-cyan-400"></i> All Transactions
+        </button>
+        <button onclick="switchTab('logs')" id="nav-logs" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-slate-800 transition">
+          <i class="fa-solid fa-network-wired mr-1.5 text-amber-400"></i> Webhook Logs
+        </button>
+      </nav>
+
+      <div class="flex items-center space-x-4">
+        <span class="text-xs text-slate-400 font-mono hidden sm:inline" id="admin-user-display">admin@thuruvanpay.in</span>
+        <button onclick="logoutAdmin()" class="text-xs font-bold text-rose-400 hover:text-rose-300 transition flex items-center gap-1.5 bg-rose-950/40 border border-rose-900/60 px-3 py-1.5 rounded-xl">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Subnav -->
+  <div class="md:hidden bg-slate-900 border-b border-slate-800 p-2 flex gap-1 overflow-x-auto text-xs font-bold">
+    <button onclick="switchTab('overview')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-white">Overview</button>
+    <button onclick="switchTab('merchants')" class="px-3 py-1.5 rounded-lg text-slate-400">Merchants</button>
+    <button onclick="switchTab('transactions')" class="px-3 py-1.5 rounded-lg text-slate-400">Transactions</button>
+    <button onclick="switchTab('logs')" class="px-3 py-1.5 rounded-lg text-slate-400">Logs</button>
+  </div>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="tab-overview" class="space-y-8">
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-black text-white">Platform Health & Telemetry</h1>
+          <p class="text-xs text-slate-400 mt-1">Real-time aggregate data across all merchant gateway nodes</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="loadAdminStats()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> Refresh
+          </button>
+          <button onclick="openForceVerifyModal()" class="px-4 py-2 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-xs font-bold text-white rounded-xl shadow-md transition flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt"></i> Force Verify Order
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Platform Revenue -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Processed Volume</p>
+          <p class="text-3xl font-black text-white mt-2" id="kpi-revenue">₹0.00</p>
+          <p class="text-[11px] text-emerald-400 font-semibold mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-circle-check"></i> 100% Direct Settled
+          </p>
+        </div>
+
+        <!-- Total Merchants -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl"></div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Merchants</p>
+          <p class="text-3xl font-black text-white mt-2" id="kpi-merchants">0</p>
+          <p class="text-[11px] text-indigo-400 font-semibold mt-1" id="kpi-active-merchants">0 active accounts</p>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-cyan-500/10 rounded-full blur-xl"></div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Completed Orders</p>
+          <p class="text-3xl font-black text-white mt-2" id="kpi-success-orders">0</p>
+          <p class="text-[11px] text-slate-400 font-medium mt-1" id="kpi-total-orders">Total 0 initiated</p>
+        </div>
+
+        <!-- Success Rate -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-rose-500/10 rounded-full blur-xl"></div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Gateway Success Rate</p>
+          <p class="text-3xl font-black text-white mt-2" id="kpi-success-rate">100%</p>
+          <p class="text-[11px] text-rose-400 font-semibold mt-1" id="kpi-pending-orders">0 currently pending</p>
+        </div>
+      </div>
+
+      <!-- Recent Orders Stream -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+          <h3 class="font-bold text-white text-sm">Platform Live Transaction Feed</h3>
+          <button onclick="switchTab('transactions')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300">View All &rarr;</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead>
+              <tr class="bg-slate-950/60 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-800">
+                <th class="p-3.5">Order ID</th>
+                <th class="p-3.5">Merchant</th>
+                <th class="p-3.5">Amount</th>
+                <th class="p-3.5">Status</th>
+                <th class="p-3.5">UTR</th>
+                <th class="p-3.5">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="overview-orders-tbody" class="divide-y divide-slate-800/60">
+              <tr><td colspan="6" class="p-6 text-center text-slate-500">Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: MERCHANTS -->
+    <div id="tab-merchants" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white">Merchant Accounts</h2>
+          <p class="text-xs text-slate-400 mt-1">Manage onboarded merchants, verify UPI IDs, and toggle access</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead>
+              <tr class="bg-slate-950/60 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-800">
+                <th class="p-4">ID</th>
+                <th class="p-4">Merchant Name</th>
+                <th class="p-4">Email</th>
+                <th class="p-4">UPI VPA</th>
+                <th class="p-4">Volume</th>
+                <th class="p-4">Orders</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="merchants-tbody" class="divide-y divide-slate-800/60">
+              <tr><td colspan="8" class="p-6 text-center text-slate-500">Loading merchants...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TRANSACTIONS -->
+    <div id="tab-transactions" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-white">All Platform Transactions</h2>
+          <p class="text-xs text-slate-400 mt-1">Audit, trace, and manually verify any order across the gateway</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="order-search-input" placeholder="Search Order ID / UTR / Customer..." oninput="debounceSearch()" class="bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
+          <select id="order-status-filter" onchange="loadAdminOrders()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+            <option value="ALL">All Status</option>
+            <option value="SUCCESS">Success</option>
+            <option value="PENDING">Pending</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead>
+              <tr class="bg-slate-950/60 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-800">
+                <th class="p-4">Order ID</th>
+                <th class="p-4">Merchant</th>
+                <th class="p-4">Customer</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">UTR</th>
+                <th class="p-4">Created</th>
+                <th class="p-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody" class="divide-y divide-slate-800/60">
+              <tr><td colspan="8" class="p-6 text-center text-slate-500">Loading transactions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: WEBHOOK LOGS -->
+    <div id="tab-logs" class="space-y-6 hidden">
+      <div>
+        <h2 class="text-2xl font-black text-white">Webhook Delivery Logs</h2>
+        <p class="text-xs text-slate-400 mt-1">Real-time trace of webhook callback dispatches sent to merchant endpoints</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead>
+              <tr class="bg-slate-950/60 text-slate-500 uppercase font-bold tracking-wider border-b border-slate-800">
+                <th class="p-4">Order ID</th>
+                <th class="p-4">Merchant Target URL</th>
+                <th class="p-4">HTTP Status</th>
+                <th class="p-4">Response Sample</th>
+                <th class="p-4">Dispatched At</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody" class="divide-y divide-slate-800/60">
+              <tr><td colspan="5" class="p-6 text-center text-slate-500">Loading webhook logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal: Force Verify Order -->
+  <div id="verify-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-white text-base">Force Verify Order</h3>
+        <button onclick="closeForceVerifyModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400">Manually marks the order as SUCCESS, credits the merchant balance, and dispatches their Webhook callback immediately.</p>
+
+      <form onsubmit="handleForceVerify(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Target Order ID</label>
+          <input type="text" id="modal-order-id" required placeholder="ORD_..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs mono text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Bank UTR / Ref Number</label>
+          <input type="text" id="modal-utr" placeholder="Leave empty for auto ADMIN UTR" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs mono text-white">
+        </div>
+
+        <button type="submit" id="btn-force-submit" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Confirm & Force Settle Order
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) {
+      window.location.href = '/admin-login.html';
+    }
+
+    const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+    if (adminUser.email) {
+      document.getElementById('admin-user-display').textContent = adminUser.email;
+    }
+
+    function switchTab(tabId) {
+      ['overview', 'merchants', 'transactions', 'logs'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${t}`);
+        if (navBtn) {
+          navBtn.className = 'px-3.5 py-2 rounded-xl hover:text-white hover:bg-slate-800 transition text-slate-400';
+        }
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.className = 'px-3.5 py-2 rounded-xl text-white bg-slate-800 transition';
+      }
+
+      if (tabId === 'overview') loadAdminStats();
+      if (tabId === 'merchants') loadAdminMerchants();
+      if (tabId === 'transactions') loadAdminOrders();
+      if (tabId === 'logs') loadWebhookLogs();
+    }
+
+    async function loadAdminStats() {
+      try {
+        const res = await fetch('/admin-api/stats', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (res.status === 401 || res.status === 403) return logoutAdmin();
+
+        const data = await res.json();
+        if (data.status) {
+          const s = data.stats;
+          document.getElementById('kpi-revenue').textContent = `₹${parseFloat(s.totalRevenue).toFixed(2)}`;
+          document.getElementById('kpi-merchants').textContent = s.totalMerchants;
+          document.getElementById('kpi-active-merchants').textContent = `${s.activeMerchants} active accounts`;
+          document.getElementById('kpi-success-orders').textContent = s.successOrders;
+          document.getElementById('kpi-total-orders').textContent = `Total ${s.totalOrders} initiated`;
+          document.getElementById('kpi-success-rate').textContent = `${s.successRate}%`;
+          document.getElementById('kpi-pending-orders').textContent = `${s.pendingOrders} currently pending`;
+        }
+
+        // Also load recent 10 for overview
+        const ordRes = await fetch('/admin-api/orders', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const ordData = await ordRes.json();
+        if (ordData.status) {
+          renderOverviewOrders(ordData.orders.slice(0, 8));
+        }
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    function renderOverviewOrders(orders) {
+      const tbody = document.getElementById('overview-orders-tbody');
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No transactions recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = orders.map(o => {
+        const isSuccess = o.status === 'SUCCESS';
+        const badge = isSuccess
+          ? `<span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px]">SUCCESS</span>`
+          : `<span class="px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 font-bold text-[10px]">PENDING</span>`;
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3.5 font-mono font-semibold text-white">${o.order_id}</td>
+            <td class="p-3.5">${o.merchant_name}</td>
+            <td class="p-3.5 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
+            <td class="p-3.5">${badge}</td>
+            <td class="p-3.5 mono text-slate-400">${o.utr || '-'}</td>
+            <td class="p-3.5 text-slate-500">${new Date(o.created_at).toLocaleString()}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadAdminMerchants() {
+      try {
+        const res = await fetch('/admin-api/merchants', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('merchants-tbody');
+
+        if (data.status && data.merchants.length > 0) {
+          tbody.innerHTML = data.merchants.map(m => {
+            const isActive = m.is_active === 1;
+            const badge = isActive
+              ? `<span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px]">ACTIVE</span>`
+              : `<span class="px-2 py-0.5 rounded-full bg-rose-950 text-rose-400 border border-rose-800 font-bold text-[10px]">SUSPENDED</span>`;
+
+            return `
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 mono text-slate-400">#${m.id}</td>
+                <td class="p-4 font-bold text-white">${m.name}</td>
+                <td class="p-4 text-slate-400">${m.email}</td>
+                <td class="p-4 mono text-indigo-400">${m.upi_vpa || 'Not configured'}</td>
+                <td class="p-4 font-bold text-white">₹${parseFloat(m.total_volume).toFixed(2)}</td>
+                <td class="p-4 text-slate-400">${m.orders_count} orders</td>
+                <td class="p-4">${badge}</td>
+                <td class="p-4 text-right">
+                  <button onclick="toggleMerchant(${m.id})" class="px-3 py-1 rounded-lg text-[11px] font-bold ${isActive ? 'bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800' : 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-800'} transition">
+                    ${isActive ? 'Suspend' : 'Activate'}
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No merchants found.</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function toggleMerchant(id) {
+      if (!confirm('Are you sure you want to change this merchant account status?')) return;
+      try {
+        const res = await fetch(`/admin-api/merchants/${id}/toggle`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const d = await res.json();
+        alert(d.message);
+        loadAdminMerchants();
+      } catch (e) {
+        alert('Action failed');
+      }
+    }
+
+    let searchTimeout = null;
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(loadAdminOrders, 300);
+    }
+
+    async function loadAdminOrders() {
+      const search = document.getElementById('order-search-input').value;
+      const status = document.getElementById('order-status-filter').value;
+
+      try {
+        const res = await fetch(`/admin-api/orders?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('orders-tbody');
+
+        if (data.status && data.orders.length > 0) {
+          tbody.innerHTML = data.orders.map(o => {
+            const isSuccess = o.status === 'SUCCESS';
+            const badge = isSuccess
+              ? `<span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px]">SUCCESS</span>`
+              : `<span class="px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 font-bold text-[10px]">PENDING</span>`;
+
+            return `
+              <tr class="hover:bg-slate-800/40 transition">
+                <td class="p-4 font-mono font-semibold text-white">${o.order_id}</td>
+                <td class="p-4">${o.merchant_name}</td>
+                <td class="p-4 text-slate-400">${o.customer_name || 'N/A'}</td>
+                <td class="p-4 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
+                <td class="p-4">${badge}</td>
+                <td class="p-4 mono text-slate-400">${o.utr || '-'}</td>
+                <td class="p-4 text-slate-500">${new Date(o.created_at).toLocaleString()}</td>
+                <td class="p-4 text-right">
+                  ${!isSuccess ? `
+                    <button onclick="quickForceVerify('${o.order_id}')" class="px-2.5 py-1 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 rounded-lg text-[10px] font-bold transition">
+                      Force Verify
+                    </button>
+                  ` : `
+                    <span class="text-slate-600 text-[10px]">Settled</span>
+                  `}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">No transactions matching filter.</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadWebhookLogs() {
+      try {
+        const res = await fetch('/admin-api/webhook-logs', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('logs-tbody');
+
+        if (data.status && data.logs.length > 0) {
+          tbody.innerHTML = data.logs.map(l => `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-4 font-mono font-semibold text-white">${l.order_id}</td>
+              <td class="p-4 font-mono text-slate-400 text-[11px] truncate max-w-xs">${l.url}</td>
+              <td class="p-4">
+                <span class="px-2 py-0.5 rounded-full ${l.response_status === 200 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'} font-bold text-[10px]">
+                  HTTP ${l.response_status}
+                </span>
+              </td>
+              <td class="p-4 font-mono text-slate-500 text-[11px] truncate max-w-xs">${l.response_body || '-'}</td>
+              <td class="p-4 text-slate-500">${new Date(l.created_at).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">No webhook delivery logs yet.</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function openForceVerifyModal(orderId = '') {
+      document.getElementById('modal-order-id').value = orderId;
+      document.getElementById('verify-modal').classList.remove('hidden');
+    }
+
+    function closeForceVerifyModal() {
+      document.getElementById('verify-modal').classList.add('hidden');
+    }
+
+    function quickForceVerify(orderId) {
+      openForceVerifyModal(orderId);
+    }
+
+    async function handleForceVerify(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('modal-order-id').value.trim();
+      const utr = document.getElementById('modal-utr').value.trim();
+      const btn = document.getElementById('btn-force-submit');
+
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const res = await fetch(`/admin-api/orders/${orderId}/verify`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ utr })
+        });
+        const d = await res.json();
+        alert(d.message);
+        closeForceVerifyModal();
+        loadAdminStats();
+        loadAdminOrders();
+      } catch (err) {
+        alert('Verification request failed.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirm & Force Settle Order';
+      }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      window.location.href = '/admin-login.html';
+    }
+
+    loadAdminStats();
+  </script>
+</body>
+</html>

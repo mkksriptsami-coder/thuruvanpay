@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Portal - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+    
+    <!-- Top Accent Gradient -->
+    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-500 via-indigo-500 to-emerald-500"></div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-indigo-600 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-900/40">
+        <i class="fa-solid fa-shield-halved text-xl"></i>
+      </div>
+      <h1 class="text-2xl font-black tracking-tight text-white">Super Admin Control</h1>
+      <p class="text-xs text-slate-400 mt-1">Master Gateway Administration & Monitoring</p>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
+
+    <!-- Login Form -->
+    <form onsubmit="handleAdminLogin(event)" class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Admin Email</label>
+        <div class="relative">
+          <i class="fa-solid fa-user-shield absolute left-4 top-3.5 text-slate-500 text-sm"></i>
+          <input type="email" id="admin-email" value="admin@thuruvanpay.in" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-800 transition">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Master Password</label>
+        <div class="relative">
+          <i class="fa-solid fa-key absolute left-4 top-3.5 text-slate-500 text-sm"></i>
+          <input type="password" id="admin-password" value="Admin@123" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-800 transition">
+        </div>
+      </div>
+
+      <button type="submit" id="btn-admin-submit" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-900/30 transition">
+        Authenticate & Access Admin Panel
+      </button>
+    </form>
+
+    <!-- Credential Hint -->
+    <div class="mt-6 p-3 bg-slate-800/50 rounded-xl border border-slate-800 text-[11px] text-slate-400 text-center">
+      Default Access: <span class="mono text-indigo-400">admin@thuruvanpay.in</span> / <span class="mono text-rose-400">Admin@123</span>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="/login.html" class="text-xs text-slate-500 hover:text-slate-300 transition flex items-center justify-center gap-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Merchant Login
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    if (localStorage.getItem('adminToken')) {
+      window.location.href = '/admin.html';
+    }
+
+    function showAlert(msg, isSuccess = false) {
+      const el = document.getElementById('alert-box');
+      el.className = `mb-6 p-4 rounded-xl text-xs font-semibold ${isSuccess ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800' : 'bg-rose-950/80 text-rose-300 border border-rose-800'}`;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+      const btn = document.getElementById('btn-admin-submit');
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying Credentials...';
+
+      try {
+        const res = await fetch('/admin-api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.status) {
+          localStorage.setItem('adminToken', data.token);
+          localStorage.setItem('adminUser', JSON.stringify(data.admin));
+          showAlert('Access Granted! Loading Admin Control...', true);
+          setTimeout(() => window.location.href = '/admin.html', 800);
+        } else {
+          showAlert(data.message || 'Authentication failed');
+        }
+      } catch (err) {
+        showAlert('Server connection error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Authenticate & Access Admin Panel';
+      }
+    }
+  </script>
+</body>
+</html>

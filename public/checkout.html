@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete UPI Payment - Secure Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
+
+  <!-- Payment Container -->
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden relative">
+    
+    <!-- Top Bar -->
+    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 p-6 text-white text-center relative">
+      <div class="flex items-center justify-between text-xs opacity-80 mb-3">
+        <span class="flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> 256-Bit SSL Encrypted</span>
+        <span id="countdown" class="bg-indigo-800/80 px-2.5 py-0.5 rounded-full font-bold mono">05:00</span>
+      </div>
+
+      <p class="text-xs uppercase tracking-wider font-semibold opacity-90" id="merchant-title">Paying to Merchant</p>
+      <div class="mt-1 flex items-baseline justify-center gap-1">
+        <span class="text-xl font-bold opacity-80">₹</span>
+        <h1 class="text-4xl font-extrabold tracking-tight" id="order-amount">0.00</h1>
+      </div>
+      <p class="text-[11px] opacity-75 mt-1 mono" id="order-id-label">Order: Loading...</p>
+    </div>
+
+    <!-- Main Payment Body -->
+    <div id="payment-body" class="p-6 space-y-6">
+      
+      <!-- QR Code Section -->
+      <div class="flex flex-col items-center justify-center">
+        <div class="p-3 bg-white rounded-2xl border-2 border-indigo-100 shadow-md flex items-center justify-center">
+          <img id="qr-image" src="" alt="UPI QR Code" class="w-56 h-56 rounded-lg object-contain">
+        </div>
+        <p class="text-xs font-semibold text-slate-500 mt-3 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Scan with Any UPI App to Pay
+        </p>
+      </div>
+
+      <!-- Quick UPI App Buttons (Mobile Optimized) -->
+      <div class="space-y-2">
+        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">Or Tap to Pay Directly on Mobile</p>
+        
+        <div class="grid grid-cols-2 gap-2">
+          <a id="btn-gpay" href="#" class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-indigo-600 bg-slate-50 hover:bg-indigo-50/50 transition text-xs font-bold text-slate-800">
+            <i class="fa-brands fa-google text-blue-500 text-sm"></i> Google Pay
+          </a>
+          <a id="btn-phonepe" href="#" class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-purple-600 bg-slate-50 hover:bg-purple-50/50 transition text-xs font-bold text-slate-800">
+            <i class="fa-solid fa-mobile-screen text-purple-600 text-sm"></i> PhonePe
+          </a>
+          <a id="btn-paytm" href="#" class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-cyan-600 bg-slate-50 hover:bg-cyan-50/50 transition text-xs font-bold text-slate-800">
+            <i class="fa-solid fa-wallet text-cyan-600 text-sm"></i> Paytm
+          </a>
+          <a id="btn-generic" href="#" class="flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 hover:border-emerald-600 bg-slate-50 hover:bg-emerald-50/50 transition text-xs font-bold text-slate-800">
+            <i class="fa-solid fa-qrcode text-emerald-600 text-sm"></i> Other UPI
+          </a>
+        </div>
+      </div>
+
+      <!-- Fallback UTR Submit Accordion -->
+      <div class="border-t border-slate-100 pt-4">
+        <button onclick="toggleUtrBox()" class="w-full text-xs font-bold text-indigo-600 hover:underline flex items-center justify-center gap-1.5">
+          <span>Paid but not redirected? Enter 12-digit UTR</span>
+          <i class="fa-solid fa-chevron-down text-[10px]" id="utr-arrow"></i>
+        </button>
+
+        <div id="utr-box" class="hidden mt-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+          <label class="block text-[11px] font-bold text-slate-600">Enter UPI Reference / UTR Number</label>
+          <div class="flex gap-2">
+            <input type="text" id="utr-input" maxlength="20" placeholder="e.g. 427928392019" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs mono">
+            <button onclick="submitUtr()" id="btn-submit-utr" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition">
+              Verify
+            </button>
+          </div>
+          <p id="utr-msg" class="text-[11px] text-slate-500 font-medium"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Success Screen (Hidden by default) -->
+    <div id="success-screen" class="p-8 text-center space-y-4 hidden">
+      <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-emerald-100 animate-bounce">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h2 class="text-2xl font-black text-slate-900">Payment Successful!</h2>
+      <p class="text-xs text-slate-500">Your transaction has been verified. Redirecting you back to merchant website...</p>
+      <div class="p-4 bg-slate-50 rounded-2xl text-xs mono text-slate-700 border border-slate-100">
+        <p>UTR: <span id="success-utr" class="font-bold">-</span></p>
+      </div>
+      <a id="manual-redirect-btn" href="#" class="inline-block px-6 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition">
+        Click here if not redirected
+      </a>
+    </div>
+
+    <!-- Expired Screen -->
+    <div id="expired-screen" class="p-8 text-center space-y-4 hidden">
+      <div class="w-16 h-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <h2 class="text-xl font-bold text-slate-900">Payment Session Expired</h2>
+      <p class="text-xs text-slate-500">The 5-minute QR code validity window has expired. Please initiate a new payment from merchant.</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-slate-50 p-4 border-t border-slate-100 text-center text-[10px] text-slate-400 font-semibold">
+      Powered by ThuruvanPay Gateway Engine &bull; Safe & Direct NPCI Settlement
+    </div>
+
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
+
+    if (!orderId) {
+      alert('Missing order_id in URL');
+    }
+
+    let checkInterval = null;
+    let timerSeconds = 300; // 5 minutes
+    let redirectUrl = null;
+
+    async function loadOrder() {
+      try {
+        const res = await fetch(`/api/public-order/${orderId}`);
+        const data = await res.json();
+
+        if (!data.status) {
+          alert('Order not found!');
+          return;
+        }
+
+        const o = data.data;
+        document.getElementById('merchant-title').textContent = `Paying to ${o.upi_name || 'Merchant'}`;
+        document.getElementById('order-amount').textContent = parseFloat(o.amount).toFixed(2);
+        document.getElementById('order-id-label').textContent = `Order: ${o.order_id}`;
+        document.getElementById('qr-image').src = o.qr_code;
+        redirectUrl = o.redirect_url;
+
+        // Set Intent URLs
+        const upiIntent = o.upi_intent;
+        document.getElementById('btn-generic').href = upiIntent;
+        document.getElementById('btn-gpay').href = upiIntent;
+        document.getElementById('btn-phonepe').href = upiIntent;
+        document.getElementById('btn-paytm').href = upiIntent;
+
+        if (o.status === 'SUCCESS') {
+          showSuccess(o.utr);
+          return;
+        }
+
+        // Start Auto Polling
+        startPolling();
+        // Start Countdown Timer
+        startCountdown();
+
+      } catch (err) {
+        console.error('Failed to load order:', err);
+      }
+    }
+
+    function startPolling() {
+      checkInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/order-status/${orderId}`);
+          const d = await res.json();
+
+          if (d.status && d.data.status === 'SUCCESS') {
+            clearInterval(checkInterval);
+            showSuccess(d.data.utr);
+          }
+        } catch (e) {
+          console.log('Poll retry...');
+        }
+      }, 2500);
+    }
+
+    function startCountdown() {
+      const el = document.getElementById('countdown');
+      const interval = setInterval(() => {
+        timerSeconds--;
+        const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+        const s = (timerSeconds % 60).toString().padStart(2, '0');
+        el.textContent = `${m}:${s}`;
+
+        if (timerSeconds <= 0) {
+          clearInterval(interval);
+          clearInterval(checkInterval);
+          document.getElementById('payment-body').classList.add('hidden');
+          document.getElementById('expired-screen').classList.remove('hidden');
+        }
+      }, 1000);
+    }
+
+    function showSuccess(utr) {
+      clearInterval(checkInterval);
+      document.getElementById('payment-body').classList.add('hidden');
+      document.getElementById('success-screen').classList.remove('hidden');
+      document.getElementById('success-utr').textContent = utr || 'VERIFIED';
+
+      if (redirectUrl) {
+        document.getElementById('manual-redirect-btn').href = redirectUrl;
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 2200);
+      } else {
+        document.getElementById('manual-redirect-btn').classList.add('hidden');
+      }
+    }
+
+    function toggleUtrBox() {
+      const box = document.getElementById('utr-box');
+      const arrow = document.getElementById('utr-arrow');
+      box.classList.toggle('hidden');
+      arrow.classList.toggle('rotate-180');
+    }
+
+    async function submitUtr() {
+      const utr = document.getElementById('utr-input').value.trim();
+      const msg = document.getElementById('utr-msg');
+      const btn = document.getElementById('btn-submit-utr');
+
+      if (!utr || utr.length < 10) {
+        msg.textContent = 'Please enter a valid 12-digit UTR.';
+        msg.className = 'text-[11px] text-rose-600 font-bold';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+
+      try {
+        const res = await fetch('/api/pay/verify-utr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id: orderId, utr })
+        });
+        const d = await res.json();
+
+        if (d.status) {
+          showSuccess(utr);
+        } else {
+          msg.textContent = d.message || 'Verification failed';
+          msg.className = 'text-[11px] text-rose-600 font-bold';
+        }
+      } catch (err) {
+        msg.textContent = 'Connection error.';
+        msg.className = 'text-[11px] text-rose-600 font-bold';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify';
+      }
+    }
+
+    loadOrder();
+  </script>
+</body>
+</html>
