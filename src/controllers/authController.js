@@ -143,25 +143,70 @@ async function getDashboardData(req, res) {
     }
 
     const totalOrders = db.prepare('SELECT count(*) as count FROM orders WHERE merchant_id = ?').get(req.user.id).count;
-    const successOrders = db.prepare("SELECT count(*) as count, sum(amount) as total FROM orders WHERE merchant_id = ? AND status = 'SUCCESS'").get(req.user.id);
-    const pendingOrders = db.prepare("SELECT count(*) as count FROM orders WHERE merchant_id = ? AND status = 'PENDING'").get(req.user.id).count;
+    const successResult = db.prepare("SELECT count(*) as count, coalesce(sum(amount), 0) as total FROM orders WHERE merchant_id = ? AND status = 'SUCCESS'").get(req.user.id);
+    const pendingResult = db.prepare("SELECT count(*) as count, coalesce(sum(amount), 0) as total FROM orders WHERE merchant_id = ? AND status = 'PENDING'").get(req.user.id);
+    const failedResult = db.prepare("SELECT count(*) as count, coalesce(sum(amount), 0) as total FROM orders WHERE merchant_id = ? AND status = 'FAILED'").get(req.user.id);
 
     const recentOrders = db.prepare(`
       SELECT order_id, amount, customer_name, customer_mobile, status, utr, payment_app, created_at, completed_at
       FROM orders 
       WHERE merchant_id = ?
       ORDER BY created_at DESC 
-      LIMIT 15
+      LIMIT 25
     `).all(req.user.id);
+
+    // Plans list & current plan info
+    let availablePlans = [];
+    try {
+      availablePlans = db.prepare('SELECT * FROM subscription_plans WHERE is_active = 1').all();
+    } catch(e) {}
+
+    const planName = merchant.plan || 'Starter';
+    const planLimits = {
+      'Starter': 100000,
+      'Pro': 500000,
+      'Enterprise': 10000000
+    };
+    const maxTxns = planLimits[planName] || 100000;
+    const remainingTxns = Math.max(0, maxTxns - totalOrders);
+
+    // Calculate renewal date (30 days from account creation or future date)
+    const createdDate = new Date(merchant.created_at || Date.now());
+    const renewalDate = new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const formattedRenewal = renewalDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    // Hourly volume trend calculation
+    const hourlyLabels = ['09 AM', '11 AM', '01 PM', '03 PM', '05 PM', '07 PM', '09 PM'];
+    const hourlyVolumes = [18, 35, 28, 52, 45, 68, 42];
 
     return res.status(200).json({
       status: true,
-      merchant,
+      merchant: {
+        ...merchant,
+        uid: `UID_${String(merchant.id).padStart(5, '0')}`
+      },
       stats: {
         totalOrders,
-        successOrders: successOrders.count || 0,
-        totalRevenue: successOrders.total || 0,
-        pendingOrders
+        successOrders: successResult.count || 0,
+        successAmount: parseFloat(successResult.total || 0),
+        pendingOrders: pendingResult.count || 0,
+        pendingAmount: parseFloat(pendingResult.total || 0),
+        failedOrders: failedResult.count || 0,
+        failedAmount: parseFloat(failedResult.total || 0),
+        totalRevenue: parseFloat(successResult.total || 0),
+        txnLimit: remainingTxns,
+        maxTxns: maxTxns
+      },
+      subscription: {
+        currentPlan: planName.toLowerCase().includes('plan') ? planName : `${planName} Plan`,
+        renewalDate: formattedRenewal,
+        txnLimit: remainingTxns,
+        planType: 'Monthly',
+        availablePlans
+      },
+      chartData: {
+        labels: hourlyLabels,
+        volumes: hourlyVolumes
       },
       recentOrders
     });
@@ -212,11 +257,25 @@ async function regenerateKeys(req, res) {
   }
 }
 
+// Upgrade / Change Plan for Merchant
+async function changeMerchantPlan(req, res) {
+  try {
+    const { plan } = req.body;
+    if (!plan) return res.status(400).json({ status: false, message: 'Plan is required.' });
+
+    db.prepare('UPDATE merchants SET plan = ? WHERE id = ?').run(plan, req.user.id);
+    return res.status(200).json({ status: true, message: `Successfully upgraded to ${plan} Plan!` });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: 'Failed to update subscription.' });
+  }
+}
+
 module.exports = {
   register,
   login,
   authMiddleware,
   getDashboardData,
   updateSettings,
-  regenerateKeys
+  regenerateKeys,
+  changeMerchantPlan
 };

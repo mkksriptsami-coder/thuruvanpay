@@ -3,244 +3,739 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Merchant Portal - Dashboard</title>
+  <title>ThuruvanPay | Merchant Console</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    
+    /* Card Styles */
+    .card-clean {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+    .dark .card-clean {
+      background: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    
+    .nav-item-active {
+      background: #4f46e5 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+    
+    .toast-anim {
+      animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideInDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-[#f8fafc] dark:bg-[#070b14] text-slate-800 dark:text-slate-200 min-h-screen flex antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
 
-  <!-- Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <a href="/" class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <span class="text-xl font-black text-slate-900 tracking-tight">Thuruvan<span class="text-indigo-600">Pay</span></span>
-        </a>
-        <span class="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-lg">Merchant Console</span>
-      </div>
-
-      <div class="flex items-center space-x-4">
-        <a href="/api-docs.html" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition flex items-center gap-1.5">
-          <i class="fa-solid fa-file-code text-indigo-500"></i> API Docs
-        </a>
-        <button onclick="openTestModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2">
-          <i class="fa-solid fa-qrcode"></i> Test Payment QR
-        </button>
-        <div class="h-6 w-px bg-slate-200"></div>
-        <button onclick="logout()" class="text-xs font-bold text-rose-600 hover:text-rose-700 transition flex items-center gap-1">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
-
-    <!-- Welcome & Top Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-black text-slate-900">Welcome, <span id="merchant-name" class="text-indigo-600">Merchant</span></h1>
-        <p class="text-xs text-slate-500 mt-0.5" id="merchant-email">loading credentials...</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
-          <i class="fa-solid fa-crown text-amber-500"></i>
-          <span id="merchant-plan-text">PRO Plan</span>
-        </span>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Gateway Active
-        </span>
-        <button onclick="loadDashboard()" class="p-2 text-slate-400 hover:text-slate-600 transition text-sm" title="Refresh">
-          <i class="fa-solid fa-rotate-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      <!-- Total Collected -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Collected</p>
-        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-revenue">₹0.00</p>
-        <p class="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-          <i class="fa-solid fa-circle-check"></i> Settle Direct to Bank
-        </p>
-      </div>
-
-      <!-- Successful Orders -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Completed Orders</p>
-        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-success">0</p>
-        <p class="text-xs text-slate-500 font-medium mt-1">Verified transactions</p>
-      </div>
-
-      <!-- Pending Orders -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Pending Orders</p>
-        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-pending">0</p>
-        <p class="text-xs text-amber-600 font-medium mt-1">Awaiting customer payment</p>
-      </div>
-
-      <!-- Total Created -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Initiated</p>
-        <p class="text-2xl font-black text-slate-900 mt-2" id="stat-total">0</p>
-        <p class="text-xs text-indigo-600 font-medium mt-1">All time orders created</p>
-      </div>
-    </div>
-
-    <!-- Two Column Layout: API Keys & UPI Settings -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0b1120] border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-lg md:shadow-none">
+    
+    <!-- Top Brand & Navigation -->
+    <div class="p-5 space-y-6">
       
-      <!-- API Credentials Card -->
-      <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-slate-900 flex items-center gap-2">
-              <i class="fa-solid fa-key text-indigo-600"></i> API Credentials
-            </h3>
-            <button onclick="regenerateKeys()" class="text-xs font-semibold text-rose-600 hover:text-rose-700 transition">
-              <i class="fa-solid fa-arrows-rotate mr-1"></i> Roll Keys
-            </button>
-          </div>
-          <p class="text-xs text-slate-500 mb-5">Pass these in the <code class="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono">x-api-key</code> and <code class="bg-slate-100 text-indigo-700 px-1.5 py-0.5 rounded font-mono">x-api-secret</code> headers.</p>
-
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">API Key</label>
-              <div class="flex items-center gap-2">
-                <input type="text" id="api-key-input" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-700 select-all">
-                <button onclick="copyToClipboard('api-key-input')" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
-                  <i class="fa-regular fa-copy"></i>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">API Secret</label>
-              <div class="flex items-center gap-2">
-                <input type="password" id="api-secret-input" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-700 select-all">
-                <button onclick="toggleSecretVisibility()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
-                  <i id="secret-eye-icon" class="fa-regular fa-eye"></i>
-                </button>
-                <button onclick="copyToClipboard('api-secret-input')" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition text-xs font-bold">
-                  <i class="fa-regular fa-copy"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-6 pt-5 border-t border-slate-100">
-          <a href="/api-docs.html" class="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
-            <span>Read full API documentation & code examples</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-
-      <!-- Merchant UPI Configuration -->
-      <div class="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="font-bold text-slate-900 mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-gear text-emerald-600"></i> UPI Gateway Settings
-        </h3>
-        <p class="text-xs text-slate-500 mb-5">Configure where customer payments and webhook events are directed.</p>
-
-        <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Receiver UPI VPA</label>
-            <input type="text" id="setting-upi-vpa" required placeholder="example@paytm / business@okaxis" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-            <p class="text-[11px] text-slate-400 mt-1">This UPI ID is embedded inside every QR code generated.</p>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Merchant Display Name</label>
-            <input type="text" id="setting-upi-name" required placeholder="Your Store / Brand Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Webhook URL (Payment Callback)</label>
-            <input type="url" id="setting-webhook-url" placeholder="https://yourwebsite.com/api/payment-webhook" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white transition">
-            <p class="text-[11px] text-slate-400 mt-1">We will send an HTTP POST event whenever an order is marked SUCCESS.</p>
-          </div>
-
-          <div class="pt-2">
-            <button type="submit" id="btn-save-settings" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-200 transition">
-              Save Settings
-            </button>
-          </div>
-        </form>
-      </div>
-
-    </div>
-
-    <!-- Recent Transactions Table -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-        <div>
-          <h3 class="font-bold text-slate-900">Recent Transactions</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Real-time payment order history and UTR references</p>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr class="bg-slate-50 text-slate-400 uppercase font-bold tracking-wider border-b border-slate-100">
-              <th class="p-4">Order ID</th>
-              <th class="p-4">Customer</th>
-              <th class="p-4">Amount</th>
-              <th class="p-4">Status</th>
-              <th class="p-4">UTR Number</th>
-              <th class="p-4">Date / Time</th>
-              <th class="p-4 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody id="transactions-tbody" class="divide-y divide-slate-100 text-slate-700">
-            <tr>
-              <td colspan="7" class="p-8 text-center text-slate-400">Loading transactions...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- Modal: Test Payment Order -->
-  <div id="test-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <!-- Logo Header -->
       <div class="flex items-center justify-between">
-        <h3 class="font-bold text-slate-900 text-base">Generate Test Payment</h3>
-        <button onclick="closeTestModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 text-white flex items-center justify-center font-black shadow-md shadow-indigo-600/20 text-lg border border-indigo-400/20 group-hover:scale-105 transition">
+            <i class="fa-solid fa-bolt-lightning"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-0.5">
+              <span class="text-xl font-black tracking-tight text-slate-900 dark:text-white">Thuruvan</span>
+              <span class="text-xl font-black bg-gradient-to-r from-indigo-500 to-emerald-400 bg-clip-text text-transparent">Pay</span>
+            </div>
+            <span class="text-[9px] font-extrabold uppercase font-mono tracking-wider text-emerald-600 dark:text-emerald-400">MERCHANT PORTAL</span>
+          </div>
+        </a>
+        
+        <!-- Mobile Close Button -->
+        <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
       </div>
-      <p class="text-xs text-slate-500">Test the dynamic QR checkout page using your configured UPI settings.</p>
 
-      <form onsubmit="generateTestOrder(event)" class="space-y-3">
+      <!-- Navigation List -->
+      <nav class="space-y-1.5 pt-2">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold transition nav-item-active">
+          <i class="fa-solid fa-grid-2 text-sm w-4 text-center"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="switchTab('merchants')" id="nav-merchants" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-store text-sm w-4 text-center"></i>
+          <span>Merchants / UPI</span>
+        </button>
+
+        <button onclick="switchTab('transactions')" id="nav-transactions" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-receipt text-sm w-4 text-center"></i>
+          <span>Transactions</span>
+        </button>
+
+        <button onclick="openSubscriptionModal()" id="nav-subscription" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-crown text-sm w-4 text-center text-amber-500"></i>
+          <span>Subscription</span>
+          <span class="ml-auto text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 font-extrabold" id="sidebar-plan-tag">PRO</span>
+        </button>
+
+        <button onclick="openPayLinkModal()" id="nav-payment-link" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-link text-sm w-4 text-center text-indigo-500"></i>
+          <span>Payment Link</span>
+        </button>
+
+        <button onclick="scrollToSection('api-keys-section')" id="nav-api-token" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-key text-sm w-4 text-center text-cyan-500"></i>
+          <span>API Token & Keys</span>
+        </button>
+      </nav>
+
+    </div>
+
+    <!-- Bottom Sidebar Footer -->
+    <div class="p-5 border-t border-slate-200 dark:border-slate-800 space-y-3">
+      <!-- Cluster Hardware Status -->
+      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400 font-mono">Cluster Active</span>
+        </div>
+        <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">42ms</span>
+      </div>
+
+      <!-- Logout Button -->
+      <button onclick="logout()" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-extrabold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+        <span>Logout Session</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Sidebar Overlay for Mobile -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden"></div>
+
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <div class="flex-1 flex flex-col md:pl-64 min-w-0">
+
+    <!-- ==================== TOP HEADER ==================== -->
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-[#0b1120]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+      
+      <!-- Left: Mobile Menu & Breadcrumb -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <div class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+          <span class="text-slate-400">Merchant</span>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          <span class="text-slate-900 dark:text-white font-extrabold">Console</span>
+        </div>
+      </div>
+
+      <!-- Right: Action Icons & Merchant Profile Dropdown -->
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Toggle Theme">
+          <i id="theme-toggle-icon" class="fa-solid fa-moon text-sm"></i>
+        </button>
+
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button onclick="toggleNotifications()" class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative" title="Notifications">
+            <i class="fa-regular fa-bell text-sm"></i>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500"></span>
+          </button>
+
+          <!-- Notification Dropdown -->
+          <div id="notifications-menu" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-4 space-y-3 z-50">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="text-xs font-black text-slate-900 dark:text-white">Live Alerts</span>
+              <span class="text-[10px] font-mono text-emerald-500 font-bold">100% Operational</span>
+            </div>
+            <div class="space-y-2 text-xs" id="notification-items">
+              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                <p class="font-bold text-slate-800 dark:text-slate-200">Autonomous Webhook Online</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">HMAC-SHA256 signature verification enabled.</p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
+                <p class="font-bold text-emerald-800 dark:text-emerald-300">UPI Instant Engine Ready</p>
+                <p class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">All intent apps (GPay, PhonePe, Paytm) active.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Profile Pill (Matches reference screenshot) -->
+        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-slate-800">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-sm" id="user-avatar">
+            M
+          </div>
+          <div class="hidden sm:block text-left leading-tight">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-black text-slate-900 dark:text-white font-mono" id="top-user-id">UID_00001</span>
+              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 block" id="top-user-role">Role : User</span>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ==================== MAIN BODY ==================== -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+      
+      <!-- ==================== WELCOME BAR & ACTION BUTTONS ==================== -->
+      <div class="card-clean rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <!-- Left: Welcome text & status dot -->
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <div>
+            <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+              Welcome, <span id="welcome-merchant-name" class="text-indigo-600 dark:text-indigo-400">MERCHANT</span>
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5" id="welcome-vpa-text">
+              Receiver VPA: loading...
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Top Action Buttons (Matches reference screenshot) -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Create PayLink Button -->
+          <button onclick="openPayLinkModal()" class="px-4 py-2 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
+            <i class="fa-solid fa-link text-[11px]"></i>
+            <span>Create PayLink</span>
+          </button>
+
+          <!-- Link Merchant / UPI Button -->
+          <button onclick="scrollToSection('upi-settings-section')" class="px-3.5 py-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-store text-indigo-500 text-[11px]"></i>
+            <span>Link Merchant</span>
+          </button>
+
+          <!-- API Keys Button -->
+          <button onclick="scrollToSection('api-keys-section')" class="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-key text-amber-600 dark:text-amber-400 text-[11px]"></i>
+            <span>API Keys</span>
+          </button>
+
+          <!-- Test Payment QR Button -->
+          <button onclick="openTestModal()" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-qrcode text-emerald-500 text-[11px]"></i>
+            <span>Test QR</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ==================== 4 METRIC CARDS (Exact match from screenshot, ultra clean) ==================== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        
+        <!-- CARD 1: SUCCESS AMOUNT -->
+        <div class="card-clean rounded-2xl p-5 flex items-center justify-between group hover:border-emerald-300 dark:hover:border-emerald-600 transition">
+          <div class="space-y-1.5">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">SUCCESS AMOUNT</p>
+            <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono" id="stat-success-amt">₹ 0.00</p>
+            <p class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-[10px]"></i> Direct Bank Settled
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-800/60 text-emerald-500 flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-regular fa-circle-check"></i>
+          </div>
+        </div>
+
+        <!-- CARD 2: PENDING AMOUNT -->
+        <div class="card-clean rounded-2xl p-5 flex items-center justify-between group hover:border-amber-300 dark:hover:border-amber-600 transition">
+          <div class="space-y-1.5">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">PENDING AMOUNT</p>
+            <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono" id="stat-pending-amt">₹ 0.00</p>
+            <p class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              <i class="fa-solid fa-clock text-[10px]"></i> Awaiting Customer UTR
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-800/60 text-amber-500 flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-regular fa-circle-dot"></i>
+          </div>
+        </div>
+
+        <!-- CARD 3: FAILED AMOUNT -->
+        <div class="card-clean rounded-2xl p-5 flex items-center justify-between group hover:border-rose-300 dark:hover:border-rose-600 transition">
+          <div class="space-y-1.5">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">FAILED AMOUNT</p>
+            <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono" id="stat-failed-amt">₹ 0.00</p>
+            <p class="text-[11px] font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+              <i class="fa-solid fa-shield text-[10px]"></i> 0.0% Failure Rate
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-100 dark:border-rose-800/60 text-rose-500 flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-regular fa-circle-xmark"></i>
+          </div>
+        </div>
+
+        <!-- CARD 4: TXN LIMIT -->
+        <div class="card-clean rounded-2xl p-5 flex items-center justify-between group hover:border-indigo-300 dark:hover:border-indigo-600 transition">
+          <div class="space-y-1.5">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">TXN LIMIT</p>
+            <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono" id="stat-txn-limit">99789</p>
+            <p class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+              <i class="fa-solid fa-gauge text-[10px]"></i> Monthly Quota Remaining
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-800/60 text-indigo-500 flex items-center justify-center text-xl shadow-sm">
+            <i class="fa-regular fa-pen-to-square"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== MIDDLE ROW: VOLUME TREND & SUBSCRIPTION DETAILS ==================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Left: Transaction Volume Trend Chart (8 cols) -->
+        <div class="lg:col-span-8 card-clean rounded-3xl p-6 flex flex-col justify-between">
+          
+          <!-- Chart Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <h2 class="text-base font-black text-slate-900 dark:text-white">Transaction Volume Trend</h2>
+              <p class="text-xs text-slate-400">Real-time payment velocity and hourly throughput</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-800 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                Realtime Summary
+              </span>
+              <button onclick="refreshChart()" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Canvas Container -->
+          <div class="w-full h-64 sm:h-72 relative">
+            <canvas id="volumeTrendChart"></canvas>
+          </div>
+
+        </div>
+
+        <!-- Right: Subscription Details Card (4 cols) (Exact match from screenshot) -->
+        <div class="lg:col-span-4 card-clean rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          
+          <div>
+            <!-- Header with blue icon -->
+            <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm font-bold">
+                <i class="fa-solid fa-credit-card"></i>
+              </div>
+              <h3 class="text-sm font-black text-slate-900 dark:text-white">Subscription Details</h3>
+            </div>
+
+            <!-- Detail List Rows -->
+            <div class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs pt-2">
+              
+              <div class="py-3.5 flex items-center justify-between">
+                <span class="text-slate-500 dark:text-slate-400 font-semibold">Current Plan</span>
+                <span class="font-black text-slate-900 dark:text-white" id="sub-card-plan">Starter Plan</span>
+              </div>
+
+              <div class="py-3.5 flex items-center justify-between">
+                <span class="text-slate-500 dark:text-slate-400 font-semibold">Renewal Date</span>
+                <span class="font-mono font-bold text-slate-800 dark:text-slate-200" id="sub-card-renewal">28 Sep, 2026</span>
+              </div>
+
+              <div class="py-3.5 flex items-center justify-between">
+                <span class="text-slate-500 dark:text-slate-400 font-semibold">Txns Limit</span>
+                <span class="font-mono font-extrabold text-emerald-600 dark:text-emerald-400" id="sub-card-limit">99789</span>
+              </div>
+
+              <div class="py-3.5 flex items-center justify-between">
+                <span class="text-slate-500 dark:text-slate-400 font-semibold">Plan Type</span>
+                <span class="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400" id="sub-card-type">Monthly</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Button -->
+          <button onclick="openSubscriptionModal()" class="w-full py-3.5 bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-sliders text-xs"></i>
+            <span>Manage Subscription</span>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== DUAL COMMAND ROW: API CREDENTIALS & UPI SETTINGS ==================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- API Credentials Card (6 cols) -->
+        <div id="api-keys-section" class="lg:col-span-6 card-clean rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div>
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-cyan-50 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-sm font-bold">
+                  <i class="fa-solid fa-key"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-black text-slate-900 dark:text-white">API Credentials</h3>
+                  <p class="text-[11px] text-slate-400">REST integration headers for your backend application</p>
+                </div>
+              </div>
+
+              <button onclick="regenerateKeys()" class="text-xs font-bold text-rose-600 hover:text-rose-700 transition flex items-center gap-1.5 px-3 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40">
+                <i class="fa-solid fa-arrows-rotate text-[11px]"></i> Roll Keys
+              </button>
+            </div>
+
+            <div class="space-y-4 pt-4">
+              <!-- API Key -->
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">x-api-key</label>
+                <div class="flex items-center gap-2">
+                  <input type="text" id="api-key-input" readonly class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 dark:text-slate-200 select-all focus:outline-none">
+                  <button onclick="copyToClipboard('api-key-input')" class="px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Copy Key">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- API Secret -->
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">x-api-secret</label>
+                <div class="flex items-center gap-2">
+                  <input type="password" id="api-secret-input" readonly class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 dark:text-slate-200 select-all focus:outline-none">
+                  <button onclick="toggleSecretVisibility()" class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs transition" title="Show/Hide">
+                    <i id="secret-eye-icon" class="fa-regular fa-eye"></i>
+                  </button>
+                  <button onclick="copyToClipboard('api-secret-input')" class="px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5" title="Copy Secret">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs text-indigo-900 dark:text-indigo-300 flex items-center justify-between">
+            <span class="flex items-center gap-2 font-medium">
+              <i class="fa-solid fa-shield-halved text-indigo-500"></i>
+              Keep secrets private. Rotate immediately if exposed.
+            </span>
+            <span class="text-[10px] font-mono font-bold bg-indigo-200 dark:bg-indigo-900/60 px-2 py-0.5 rounded">HMAC-SHA256</span>
+          </div>
+        </div>
+
+        <!-- Receiver UPI & Webhook Settings Card (6 cols) -->
+        <div id="upi-settings-section" class="lg:col-span-6 card-clean rounded-3xl p-6 flex flex-col justify-between space-y-6">
+          <div>
+            <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+                <i class="fa-solid fa-building-columns"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-black text-slate-900 dark:text-white">UPI Gateway & Receiver Settings</h3>
+                <p class="text-[11px] text-slate-400">Configure where customer funds are credited and webhooks sent</p>
+              </div>
+            </div>
+
+            <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-4 pt-4">
+              <!-- Receiver UPI VPA -->
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Receiver UPI VPA</label>
+                <input type="text" id="setting-upi-vpa" required placeholder="business@okaxis / 9876543210@paytm" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <!-- Merchant Display Name -->
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Merchant Brand / Business Name</label>
+                <input type="text" id="setting-upi-name" required placeholder="My Store Private Limited" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <!-- Webhook URL -->
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Webhook Endpoint URL</label>
+                <input type="url" id="setting-webhook-url" placeholder="https://yourwebsite.com/api/payment-webhook" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+              </div>
+
+              <div class="pt-2 flex items-center justify-between">
+                <button type="submit" id="btn-save-settings" class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save Gateway Settings</span>
+                </button>
+                <span class="text-[11px] text-slate-400 font-mono">1-Sec Instant Propagation</span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== RECENT TRANSACTIONS TABLE (ENTERPRISE FILTER & CSV EXPORT) ==================== -->
+      <div id="transactions-section" class="card-clean rounded-3xl overflow-hidden shadow-sm">
+        
+        <!-- Table Toolbar -->
+        <div class="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">Recent Transactions</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time payment order history and verified UTR references</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Search Input -->
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="tx-search-input" oninput="filterTransactions()" placeholder="Search Order ID / Customer / UTR..." class="pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none w-52 sm:w-64">
+            </div>
+
+            <!-- Status Filter -->
+            <select id="tx-status-filter" onchange="filterTransactions()" class="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none">
+              <option value="ALL">All Status</option>
+              <option value="SUCCESS">Success Only</option>
+              <option value="PENDING">Pending Only</option>
+            </select>
+
+            <!-- Export CSV -->
+            <button onclick="exportTransactionsCsv()" class="px-3.5 py-2 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-csv text-emerald-500"></i>
+              <span>Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/80 dark:bg-slate-900/60 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-100 dark:border-slate-800 text-[10px]">
+                <th class="p-4 pl-6">Order ID</th>
+                <th class="p-4">Customer</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">UTR Number</th>
+                <th class="p-4">Payment App</th>
+                <th class="p-4">Date / Time</th>
+                <th class="p-4 pr-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
+              <tr>
+                <td colspan="8" class="p-10 text-center text-slate-400 font-medium">
+                  <i class="fa-solid fa-circle-notch fa-spin text-lg text-indigo-500 mr-2"></i>
+                  Loading transaction ledger...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ==================== MODAL: CREATE PAYLINK ==================== -->
+  <div id="paylink-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-base">
+            <i class="fa-solid fa-link"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white text-base">Create Instant PayLink</h3>
+            <p class="text-[11px] text-slate-400">Generate a direct UPI collection link & QR</p>
+          </div>
+        </div>
+        <button onclick="closePayLinkModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center text-lg">
+          &times;
+        </button>
+      </div>
+
+      <form onsubmit="handleCreatePayLink(event)" class="space-y-4" id="paylink-form">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Amount (INR ₹)</label>
-          <input type="number" id="test-amount" value="10.00" step="1" min="1" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Amount (INR ₹) *</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">₹</span>
+            <input type="number" id="paylink-amount" step="0.01" min="1" value="499.00" required class="w-full pl-8 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-black font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Customer Name</label>
+          <input type="text" id="paylink-name" placeholder="John Doe" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Customer Mobile (Optional)</label>
+          <input type="tel" id="paylink-mobile" placeholder="9876543210" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <button type="submit" id="btn-paylink-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white font-extrabold rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+          <span>Generate Active PayLink</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+      </form>
+
+      <!-- PayLink Result Container -->
+      <div id="paylink-result" class="hidden p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> PayLink Generated!
+          </span>
+          <a id="paylink-open-btn" href="#" target="_blank" class="text-xs font-bold text-indigo-600 hover:underline">Open Checkout &rarr;</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="paylink-url-input" readonly class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-700 dark:text-slate-300 select-all">
+          <button onclick="copyToClipboard('paylink-url-input')" class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shrink-0">
+            Copy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: MANAGE SUBSCRIPTION ==================== -->
+  <div id="sub-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-slate-900 dark:text-white text-lg">Subscription Tier Plans</h3>
+          <p class="text-xs text-slate-400">Zero transaction commission. Scale as your volume grows.</p>
+        </div>
+        <button onclick="closeSubscriptionModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center text-lg">
+          &times;
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="plans-modal-grid">
+        <!-- Starter Plan Card -->
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-indigo-500 transition">
+          <div class="space-y-2">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-extrabold uppercase">30 DAYS</span>
+            <h4 class="font-black text-slate-900 dark:text-white text-base">Starter</h4>
+            <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹299</p>
+            <p class="text-[11px] text-slate-400">Up to 100,000 monthly transactions</p>
+          </div>
+          <button onclick="upgradePlan('Starter')" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition">
+            Choose Starter
+          </button>
+        </div>
+
+        <!-- Pro Plan Card (Featured) -->
+        <div class="p-5 rounded-2xl border-2 border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/30 flex flex-col justify-between space-y-4 shadow-md">
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500 text-white font-extrabold uppercase">90 DAYS</span>
+              <span class="text-[9px] font-black uppercase text-indigo-500">Popular</span>
+            </div>
+            <h4 class="font-black text-slate-900 dark:text-white text-base">Pro Business</h4>
+            <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹799</p>
+            <p class="text-[11px] text-slate-400">Up to 500,000 transactions + Priority UTR</p>
+          </div>
+          <button onclick="upgradePlan('Pro')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition">
+            Activate Pro
+          </button>
+        </div>
+
+        <!-- Enterprise Plan Card -->
+        <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-indigo-500 transition">
+          <div class="space-y-2">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-extrabold uppercase">365 DAYS</span>
+            <h4 class="font-black text-slate-900 dark:text-white text-base">Enterprise</h4>
+            <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹1,999</p>
+            <p class="text-[11px] text-slate-400">Unlimited transactions + Multi VPA pool</p>
+          </div>
+          <button onclick="upgradePlan('Enterprise')" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition">
+            Choose Enterprise
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: TEST PAYMENT ==================== -->
+  <div id="test-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-black text-slate-900 dark:text-white text-base">Launch Test Checkout</h3>
+        <button onclick="closeTestModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center text-lg">&times;</button>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">Generates a live session linked directly to your receiver UPI VPA.</p>
+
+      <form onsubmit="handleTestOrder(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Amount (₹)</label>
+          <input type="number" id="test-amount" value="10.00" step="1" min="1" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-sm font-mono font-bold text-slate-900 dark:text-white focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Customer Name</label>
-          <input type="text" id="test-cust-name" value="Test Customer" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Customer Name</label>
+          <input type="text" id="test-cust-name" value="Test Customer" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none">
         </div>
 
-        <button type="submit" id="btn-create-test" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition">
-          Launch Checkout Page
+        <button type="submit" id="btn-create-test" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-qrcode"></i>
+          <span>Open Live Checkout Page</span>
         </button>
       </form>
     </div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
     const token = localStorage.getItem('token');
     if (!token) {
@@ -248,7 +743,98 @@
     }
 
     let currentMerchant = null;
+    let cachedOrders = [];
+    let volumeChart = null;
 
+    // Toast Notification helper
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const isSuccess = type === 'success';
+      toast.className = `pointer-events-auto p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-xl border toast-anim ${
+        isSuccess 
+          ? 'bg-slate-900 text-white border-slate-800 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800' 
+          : 'bg-rose-950 text-rose-200 border-rose-800'
+      }`;
+      toast.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-rose-400'}"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Toggle Sidebar on Mobile
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      if (isHidden) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-toggle-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.className = 'fa-solid fa-moon text-sm';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-sun text-sm text-amber-400';
+        localStorage.setItem('theme', 'dark');
+      }
+      if (volumeChart) renderChart();
+    }
+
+    // Initialize Theme
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      document.getElementById('theme-toggle-icon').className = 'fa-solid fa-sun text-sm text-amber-400';
+    }
+
+    // Toggle Notification Menu
+    function toggleNotifications() {
+      const el = document.getElementById('notifications-menu');
+      el.classList.toggle('hidden');
+    }
+
+    // Scroll smoothly to section
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        el.classList.add('ring-2', 'ring-indigo-500');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-500'), 1500);
+      }
+    }
+
+    // Switch Tab in Sidebar
+    function switchTab(tab) {
+      document.querySelectorAll('#sidebar nav button').forEach(b => b.classList.remove('nav-item-active'));
+      const activeBtn = document.getElementById(`nav-${tab}`);
+      if (activeBtn) activeBtn.classList.add('nav-item-active');
+
+      if (tab === 'dashboard') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'merchants') {
+        scrollToSection('upi-settings-section');
+      } else if (tab === 'transactions') {
+        scrollToSection('transactions-section');
+      }
+      if (window.innerWidth < 768) toggleSidebar();
+    }
+
+    // Fetch and populate Dashboard Data
     async function loadDashboard() {
       try {
         const res = await fetch('/auth/dashboard', {
@@ -263,55 +849,185 @@
         const data = await res.json();
         if (data.status) {
           currentMerchant = data.merchant;
-          document.getElementById('merchant-name').textContent = currentMerchant.name;
-          document.getElementById('merchant-email').textContent = currentMerchant.email;
-          if (document.getElementById('merchant-plan-text')) {
-            document.getElementById('merchant-plan-text').textContent = (currentMerchant.plan || 'PRO') + ' Plan';
+          cachedOrders = data.recentOrders || [];
+
+          // Populate Welcome Banner & User Card
+          const mName = currentMerchant.name || 'Merchant';
+          document.getElementById('welcome-merchant-name').textContent = mName.toUpperCase();
+          document.getElementById('user-avatar').textContent = mName.charAt(0).toUpperCase();
+          document.getElementById('top-user-id').textContent = currentMerchant.uid || `UID_${String(currentMerchant.id).padStart(5, '0')}`;
+          document.getElementById('top-user-role').textContent = `Role : Merchant (${currentMerchant.plan || 'Starter'})`;
+          document.getElementById('welcome-vpa-text').textContent = `Receiver VPA: ${currentMerchant.upi_vpa || 'Not Configured'} • Bank Direct Credit Active`;
+
+          // Populate 4 Metric Cards
+          document.getElementById('stat-success-amt').textContent = `₹ ${(data.stats.successAmount || 0).toFixed(2)}`;
+          document.getElementById('stat-pending-amt').textContent = `₹ ${(data.stats.pendingAmount || 0).toFixed(2)}`;
+          document.getElementById('stat-failed-amt').textContent = `₹ ${(data.stats.failedAmount || 0).toFixed(2)}`;
+          document.getElementById('stat-txn-limit').textContent = Number(data.stats.txnLimit || 99789).toLocaleString();
+
+          // Populate Subscription Card
+          if (data.subscription) {
+            document.getElementById('sub-card-plan').textContent = data.subscription.currentPlan;
+            document.getElementById('sub-card-renewal').textContent = data.subscription.renewalDate;
+            document.getElementById('sub-card-limit').textContent = Number(data.subscription.txnLimit).toLocaleString();
+            document.getElementById('sub-card-type').textContent = data.subscription.planType;
+            document.getElementById('sidebar-plan-tag').textContent = (currentMerchant.plan || 'PRO').toUpperCase();
           }
 
-          document.getElementById('stat-revenue').textContent = `₹${data.stats.totalRevenue.toFixed(2)}`;
-          document.getElementById('stat-success').textContent = data.stats.successOrders;
-          document.getElementById('stat-pending').textContent = data.stats.pendingOrders;
-          document.getElementById('stat-total').textContent = data.stats.totalOrders;
-
+          // Populate API Credentials
           document.getElementById('api-key-input').value = currentMerchant.api_key;
           document.getElementById('api-secret-input').value = currentMerchant.api_secret;
 
+          // Populate UPI Settings
           document.getElementById('setting-upi-vpa').value = currentMerchant.upi_vpa || '';
           document.getElementById('setting-upi-name').value = currentMerchant.upi_name || '';
           document.getElementById('setting-webhook-url').value = currentMerchant.webhook_url || '';
 
-          renderTransactions(data.recentOrders);
+          // Render Transactions & Volume Chart
+          renderTransactions(cachedOrders);
+          renderChart(data.chartData);
         }
       } catch (err) {
         console.error('Failed to load dashboard:', err);
       }
     }
 
+    // Render Chart.js Volume Curve (Matches exact spline wave from reference screenshot)
+    function renderChart(chartData) {
+      const ctx = document.getElementById('volumeTrendChart').getContext('2d');
+      if (volumeChart) volumeChart.destroy();
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+
+      const labels = chartData?.labels || ['09 AM', '11 AM', '01 PM', '03 PM', '05 PM', '07 PM', '09 PM'];
+      const dataPoints = chartData?.volumes || [18, 35, 28, 52, 45, 68, 40];
+
+      // Smooth Gradient Fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(79, 70, 229, 0.35)');
+      gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+      volumeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Volume (₹)',
+            data: dataPoints,
+            borderColor: '#3b82f6',
+            borderWidth: 3,
+            fill: true,
+            backgroundColor: gradient,
+            tension: 0.45, // Smooth Bezier curve
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#3b82f6',
+            pointBorderWidth: 2.5,
+            pointRadius: 4.5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDark ? '#0f172a' : '#1e293b',
+              titleColor: '#ffffff',
+              bodyColor: '#38bdf8',
+              borderColor: isDark ? '#334155' : '#475569',
+              borderWidth: 1,
+              padding: 10,
+              boxPadding: 4,
+              callbacks: {
+                label: function(context) {
+                  return ` Volume: ${context.parsed.y} Transactions`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { family: '"JetBrains Mono"', size: 10 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { family: '"JetBrains Mono"', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function refreshChart() {
+      loadDashboard();
+      showToast('Transaction volume chart re-synchronized!', 'success');
+    }
+
+    // Render Transactions Table
     function renderTransactions(orders) {
       const tbody = document.getElementById('transactions-tbody');
       if (!orders || orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No orders created yet. Click "Test Payment QR" to create one!</td></tr>`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-12 text-center text-slate-400">
+              <div class="max-w-xs mx-auto space-y-3">
+                <i class="fa-solid fa-receipt text-3xl text-slate-300 dark:text-slate-700"></i>
+                <p class="font-bold text-slate-700 dark:text-slate-300">No Transactions Yet</p>
+                <p class="text-[11px] text-slate-400">Create a quick PayLink or launch a test QR code to start collecting funds.</p>
+                <button onclick="openPayLinkModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
+                  Create First PayLink
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
         return;
       }
 
       tbody.innerHTML = orders.map(o => {
         const isSuccess = o.status === 'SUCCESS';
-        const badge = isSuccess
-          ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">SUCCESS</span>`
-          : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">PENDING</span>`;
+        const isPending = o.status === 'PENDING';
+        
+        let badgeHtml = '';
+        if (isSuccess) {
+          badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-extrabold text-[10px] font-mono"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>SUCCESS</span>`;
+        } else if (isPending) {
+          badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-extrabold text-[10px] font-mono"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>PENDING</span>`;
+        } else {
+          badgeHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 font-extrabold text-[10px] font-mono">FAILED</span>`;
+        }
+
+        const appName = o.payment_app || 'UPI';
+        let appIcon = '<i class="fa-solid fa-qrcode text-indigo-500"></i>';
+        if (appName.toLowerCase().includes('google') || appName.toLowerCase().includes('gpay')) appIcon = '<i class="fa-brands fa-google text-blue-500"></i>';
+        if (appName.toLowerCase().includes('phonepe')) appIcon = '<i class="fa-solid fa-mobile-screen text-purple-500"></i>';
+        if (appName.toLowerCase().includes('paytm')) appIcon = '<i class="fa-solid fa-wallet text-cyan-500"></i>';
 
         return `
-          <tr class="hover:bg-slate-50/70 transition">
-            <td class="p-4 font-mono font-semibold text-slate-900">${o.order_id}</td>
-            <td class="p-4">${o.customer_name || 'N/A'}</td>
-            <td class="p-4 font-bold text-slate-900">₹${parseFloat(o.amount).toFixed(2)}</td>
-            <td class="p-4">${badge}</td>
-            <td class="p-4 font-mono text-slate-600">${o.utr || '-'}</td>
-            <td class="p-4 text-slate-400">${new Date(o.created_at).toLocaleString()}</td>
-            <td class="p-4 text-right">
-              <a href="/checkout.html?order_id=${o.order_id}" target="_blank" class="px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 rounded-lg font-semibold transition">
-                Pay Link
+          <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
+            <td class="p-4 pl-6 font-mono font-bold text-slate-900 dark:text-white">${o.order_id}</td>
+            <td class="p-4">
+              <p class="font-bold text-slate-800 dark:text-slate-200">${o.customer_name || 'Walk-in Customer'}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${o.customer_mobile || '-'}</p>
+            </td>
+            <td class="p-4 font-black font-mono text-slate-900 dark:text-white">₹ ${parseFloat(o.amount).toFixed(2)}</td>
+            <td class="p-4">${badgeHtml}</td>
+            <td class="p-4 font-mono text-slate-600 dark:text-slate-400">${o.utr || '<span class="text-slate-400 italic">Awaiting UTR</span>'}</td>
+            <td class="p-4">
+              <span class="inline-flex items-center gap-1.5 font-bold text-slate-600 dark:text-slate-400 text-[11px]">
+                ${appIcon} <span>${appName}</span>
+              </span>
+            </td>
+            <td class="p-4 text-slate-400 font-mono text-[11px]">${new Date(o.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'short', timeStyle: 'short' })}</td>
+            <td class="p-4 pr-6 text-right space-x-1.5">
+              <a href="/checkout.html?order_id=${o.order_id}" target="_blank" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600 text-slate-700 dark:text-slate-300 rounded-xl font-bold transition inline-flex items-center gap-1">
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                <span>Pay Link</span>
               </a>
             </td>
           </tr>
@@ -319,15 +1035,64 @@
       }).join('');
     }
 
+    // Filter Transactions by Search / Status
+    function filterTransactions() {
+      const q = document.getElementById('tx-search-input').value.trim().toLowerCase();
+      const status = document.getElementById('tx-status-filter').value;
+
+      const filtered = cachedOrders.filter(o => {
+        const matchesQuery = !q || 
+          (o.order_id && o.order_id.toLowerCase().includes(q)) ||
+          (o.customer_name && o.customer_name.toLowerCase().includes(q)) ||
+          (o.utr && o.utr.toLowerCase().includes(q));
+
+        const matchesStatus = status === 'ALL' || o.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      renderTransactions(filtered);
+    }
+
+    // Export Transactions CSV
+    function exportTransactionsCsv() {
+      if (!cachedOrders || cachedOrders.length === 0) {
+        showToast('No transaction orders available to export', 'error');
+        return;
+      }
+
+      const headers = ['Order ID', 'Customer Name', 'Customer Mobile', 'Amount', 'Status', 'UTR', 'Payment App', 'Created At'];
+      const rows = cachedOrders.map(o => [
+        o.order_id,
+        `"${(o.customer_name || '').replace(/"/g, '""')}"`,
+        o.customer_mobile || '',
+        o.amount,
+        o.status,
+        o.utr || '',
+        o.payment_app || 'UPI',
+        `"${new Date(o.created_at).toISOString()}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `thuruvanpay_orders_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('Transactions CSV exported successfully!');
+    }
+
+    // Save Settings
     async function saveSettings(e) {
       e.preventDefault();
-      const upi_vpa = document.getElementById('setting-upi-vpa').value;
-      const upi_name = document.getElementById('setting-upi-name').value;
-      const webhook_url = document.getElementById('setting-webhook-url').value;
+      const upi_vpa = document.getElementById('setting-upi-vpa').value.trim();
+      const upi_name = document.getElementById('setting-upi-name').value.trim();
+      const webhook_url = document.getElementById('setting-webhook-url').value.trim();
       const btn = document.getElementById('btn-save-settings');
 
       btn.disabled = true;
-      btn.textContent = 'Saving...';
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Saving...</span>`;
 
       try {
         const res = await fetch('/auth/settings', {
@@ -339,17 +1104,19 @@
           body: JSON.stringify({ upi_vpa, upi_name, webhook_url })
         });
         const d = await res.json();
-        alert(d.message);
+        showToast(d.message || 'Settings updated successfully!');
+        loadDashboard();
       } catch (e) {
-        alert('Failed to save settings.');
+        showToast('Failed to save settings', 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Save Settings';
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Save Gateway Settings</span>`;
       }
     }
 
+    // Regenerate Keys
     async function regenerateKeys() {
-      if (!confirm('Are you sure you want to regenerate your API keys? Any active integrations using current keys will stop working.')) return;
+      if (!confirm('Are you sure you want to roll your API credentials? Any external live server using these keys will immediately fail until updated.')) return;
 
       try {
         const res = await fetch('/auth/regenerate-keys', {
@@ -360,45 +1127,138 @@
         if (d.status) {
           document.getElementById('api-key-input').value = d.api_key;
           document.getElementById('api-secret-input').value = d.api_secret;
-          alert('New API Key & Secret generated!');
+          showToast('New API Credentials generated successfully!');
         }
       } catch (e) {
-        alert('Key roll failed');
+        showToast('Failed to regenerate credentials', 'error');
       }
     }
 
+    // Toggle Secret Visibility
     function toggleSecretVisibility() {
       const input = document.getElementById('api-secret-input');
       const icon = document.getElementById('secret-eye-icon');
       if (input.type === 'password') {
         input.type = 'text';
-        icon.className = 'fa-regular fa-eye-slash';
+        icon.className = 'fa-regular fa-eye-slash text-indigo-500';
       } else {
         input.type = 'password';
-        icon.className = 'fa-regular fa-eye';
+        icon.className = 'fa-regular fa-eye text-slate-500';
       }
     }
 
+    // 1-Click Copy
     function copyToClipboard(inputId) {
       const input = document.getElementById(inputId);
       navigator.clipboard.writeText(input.value);
-      alert('Copied to clipboard!');
+      showToast('Copied to clipboard!');
     }
 
+    // PayLink Modal Handlers
+    function openPayLinkModal() {
+      document.getElementById('paylink-modal').classList.remove('hidden');
+      document.getElementById('paylink-result').classList.add('hidden');
+    }
+    function closePayLinkModal() {
+      document.getElementById('paylink-modal').classList.add('hidden');
+    }
+
+    async function handleCreatePayLink(e) {
+      e.preventDefault();
+      const amount = document.getElementById('paylink-amount').value;
+      const customer_name = document.getElementById('paylink-name').value || 'Customer';
+      const customer_mobile = document.getElementById('paylink-mobile').value || '';
+      const apiKey = document.getElementById('api-key-input').value;
+      const apiSecret = document.getElementById('api-secret-input').value;
+      const btn = document.getElementById('btn-paylink-submit');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Creating Secure PayLink...</span>`;
+
+      try {
+        const res = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'x-api-secret': apiSecret
+          },
+          body: JSON.stringify({
+            amount: parseFloat(amount),
+            customer_name,
+            customer_mobile,
+            redirect_url: window.location.origin + '/dashboard.html'
+          })
+        });
+
+        const d = await res.json();
+        if (d.status) {
+          const payUrl = d.data.payment_url;
+          document.getElementById('paylink-url-input').value = payUrl;
+          document.getElementById('paylink-open-btn').href = payUrl;
+          document.getElementById('paylink-result').classList.remove('hidden');
+          showToast('Payment link generated!');
+          setTimeout(loadDashboard, 1500);
+        } else {
+          showToast(d.message || 'Error creating PayLink', 'error');
+        }
+      } catch (err) {
+        showToast('Network error creating PayLink', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Generate Active PayLink</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>`;
+      }
+    }
+
+    // Subscription Modal Handlers
+    function openSubscriptionModal() {
+      document.getElementById('sub-modal').classList.remove('hidden');
+    }
+    function closeSubscriptionModal() {
+      document.getElementById('sub-modal').classList.add('hidden');
+    }
+
+    async function upgradePlan(planName) {
+      try {
+        const res = await fetch('/auth/change-plan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ plan: planName })
+        });
+        const d = await res.json();
+        if (d.status) {
+          showToast(d.message || `Upgraded to ${planName} Plan!`);
+          closeSubscriptionModal();
+          loadDashboard();
+        } else {
+          showToast(d.message || 'Upgrade failed', 'error');
+        }
+      } catch (e) {
+        showToast('Upgrade request failed', 'error');
+      }
+    }
+
+    // Test Modal Handlers
     function openTestModal() {
       document.getElementById('test-modal').classList.remove('hidden');
     }
-
     function closeTestModal() {
       document.getElementById('test-modal').classList.add('hidden');
     }
 
-    async function generateTestOrder(e) {
+    async function handleTestOrder(e) {
       e.preventDefault();
       const amount = document.getElementById('test-amount').value;
       const customer_name = document.getElementById('test-cust-name').value;
       const apiKey = document.getElementById('api-key-input').value;
       const apiSecret = document.getElementById('api-secret-input').value;
+      const btn = document.getElementById('btn-create-test');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Initializing QR...</span>`;
 
       try {
         const res = await fetch('/api/create-order', {
@@ -419,20 +1279,26 @@
         if (d.status) {
           window.open(d.data.payment_url, '_blank');
           closeTestModal();
+          showToast('Checkout launched in new tab!');
           setTimeout(loadDashboard, 1500);
         } else {
-          alert(d.message || 'Error generating test order');
+          showToast(d.message || 'Error generating test session', 'error');
         }
       } catch (err) {
-        alert('Failed to connect to order API');
+        showToast('Failed to connect to gateway', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-qrcode"></i> <span>Open Live Checkout Page</span>`;
       }
     }
 
+    // Logout
     function logout() {
       localStorage.removeItem('token');
       window.location.href = '/login.html';
     }
 
+    // Initialize
     loadDashboard();
   </script>
 </body>
