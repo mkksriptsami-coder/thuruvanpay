@@ -44,113 +44,237 @@
       mask-composite: exclude;
       pointer-events: none;
     }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      text-align: left;
+    }
+    .nav-item:hover {
+      color: #ffffff;
+      background: rgba(30, 41, 59, 0.5);
+      border-color: rgba(255, 255, 255, 0.06);
+      transform: translateX(2px);
+    }
+    .nav-item.active {
+      color: #ffffff;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 20px -5px rgba(99, 102, 241, 0.3);
+    }
+    .nav-item.active .nav-icon-box {
+      background: rgba(99, 102, 241, 0.25);
+      border-color: rgba(99, 102, 241, 0.6);
+      color: #a5b4fc;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
+    }
+    .nav-icon-box {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.65rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body class="bg-[#050811] text-slate-200 min-h-screen flex antialiased selection:bg-indigo-500 selection:text-white">
 
   <!-- ==================== SIDEBAR ==================== -->
-  <aside class="w-72 bg-[#0b0f19] border-r border-slate-800/80 flex flex-col shrink-0 min-h-screen sticky top-0 h-screen z-40 hidden lg:flex">
+  <aside class="w-72 bg-[#070b14] border-r border-slate-800/80 flex flex-col shrink-0 min-h-screen sticky top-0 h-screen z-40 hidden lg:flex">
     
     <!-- Brand Header -->
-    <div class="p-6 border-b border-slate-800/70 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-950/60 text-lg">
-          <i class="fa-solid fa-bolt-lightning"></i>
+    <div class="p-6 border-b border-slate-800/80 bg-gradient-to-b from-slate-900/40 to-transparent">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 text-white flex items-center justify-center font-black shadow-xl shadow-indigo-950/80 text-xl border border-indigo-400/30 shrink-0">
+          <i class="fa-solid fa-bolt-lightning text-white"></i>
         </div>
-        <div>
-          <span class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
-            Thuruvan<span class="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">Pay</span>
-          </span>
+        <div class="overflow-hidden">
+          <div class="flex items-center gap-1">
+            <span class="text-lg font-black tracking-tight text-white">Thuruvan</span>
+            <span class="text-lg font-black bg-gradient-to-r from-indigo-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">Pay</span>
+          </div>
           <div class="flex items-center gap-1.5 mt-0.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Enterprise v2.4</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[9px] font-extrabold text-emerald-400 tracking-wider uppercase font-mono">CORE V2.4 ENTERPRISE</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Navigation Menu -->
-    <div class="p-4 flex-1 space-y-6 overflow-y-auto">
+    <div class="p-3.5 flex-1 space-y-6 overflow-y-auto">
       
-      <!-- Group 1: Telemetry -->
+      <!-- Group 1: Platform Telemetry -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Platform Analytics</p>
+        <div class="flex items-center gap-2 px-3 mb-2">
+          <span class="w-1 h-3 rounded-full bg-indigo-500"></span>
+          <p class="text-[9px] uppercase tracking-widest font-black text-slate-400">Telemetry & Operations</p>
+        </div>
         <div class="space-y-1">
-          <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600/15 border border-indigo-500/30 text-indigo-300 transition group">
-            <i class="fa-solid fa-chart-pie text-sm text-indigo-400"></i>
-            <span>Overview & Metrics</span>
+          <button onclick="switchTab('overview')" id="nav-overview" class="nav-item active group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-indigo-400 group-hover:text-white">
+                <i class="fa-solid fa-chart-pie text-xs"></i>
+              </div>
+              <span class="text-xs">Overview & Metrics</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 font-mono">LIVE</span>
           </button>
-          <button onclick="switchTab('transactions')" id="nav-transactions" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-money-bill-transfer text-sm text-slate-500 group-hover:text-cyan-400"></i>
-            <span>Transactions Ledger</span>
+
+          <button onclick="switchTab('transactions')" id="nav-transactions" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-emerald-400 group-hover:text-white">
+                <i class="fa-solid fa-receipt text-xs"></i>
+              </div>
+              <span class="text-xs">Transactions Ledger</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-mono">REALTIME</span>
           </button>
         </div>
       </div>
 
       <!-- Group 2: Merchants & Plans -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Ecosystem & Revenue</p>
+        <div class="flex items-center gap-2 px-3 mb-2">
+          <span class="w-1 h-3 rounded-full bg-purple-500"></span>
+          <p class="text-[9px] uppercase tracking-widest font-black text-slate-400">Ecosystem & Revenue</p>
+        </div>
         <div class="space-y-1">
-          <button onclick="switchTab('merchants')" id="nav-merchants" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-store text-sm text-slate-500 group-hover:text-emerald-400"></i>
-            <span>Merchant Hub</span>
+          <button onclick="switchTab('merchants')" id="nav-merchants" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-purple-400 group-hover:text-white">
+                <i class="fa-solid fa-store text-xs"></i>
+              </div>
+              <span class="text-xs">Merchant Hub</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-800/60 font-mono">CLIENTS</span>
           </button>
-          <button onclick="switchTab('plans')" id="nav-plans" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-tags text-sm text-slate-500 group-hover:text-amber-400"></i>
-            <span>Subscription Plans</span>
+
+          <button onclick="switchTab('plans')" id="nav-plans" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-amber-400 group-hover:text-white">
+                <i class="fa-solid fa-tags text-xs"></i>
+              </div>
+              <span class="text-xs">Subscription Plans</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-800/60 font-mono">3 TIERS</span>
           </button>
         </div>
       </div>
 
-      <!-- Group 3: UPI Infrastructure -->
+      <!-- Group 3: Core UPI Infrastructure -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Infrastructure & Security</p>
+        <div class="flex items-center gap-2 px-3 mb-2">
+          <span class="w-1 h-3 rounded-full bg-cyan-500"></span>
+          <p class="text-[9px] uppercase tracking-widest font-black text-slate-400">UPI Switch & Infra</p>
+        </div>
         <div class="space-y-1">
-          <button onclick="switchTab('upipool')" id="nav-upipool" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-layer-group text-sm text-slate-500 group-hover:text-purple-400"></i>
-            <span>Multi-UPI VPA Pool</span>
+          <button onclick="switchTab('upipool')" id="nav-upipool" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-cyan-400 group-hover:text-white">
+                <i class="fa-solid fa-layer-group text-xs"></i>
+              </div>
+              <span class="text-xs">Multi-UPI VPA Pool</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 font-mono">ROUTING</span>
           </button>
-          <button onclick="switchTab('blacklist')" id="nav-blacklist" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-shield-virus text-sm text-slate-500 group-hover:text-rose-400"></i>
-            <span>Fraud & IP Blacklist</span>
+
+          <button onclick="switchTab('blacklist')" id="nav-blacklist" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-rose-400 group-hover:text-white">
+                <i class="fa-solid fa-shield-virus text-xs"></i>
+              </div>
+              <span class="text-xs">Fraud & IP Blacklist</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-950/80 text-rose-300 border border-rose-800/60 font-mono">AI SHIELD</span>
           </button>
-          <button onclick="switchTab('logs')" id="nav-logs" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-network-wired text-sm text-slate-500 group-hover:text-blue-400"></i>
-            <span>Webhook Dispatches</span>
+
+          <button onclick="switchTab('logs')" id="nav-logs" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-blue-400 group-hover:text-white">
+                <i class="fa-solid fa-network-wired text-xs"></i>
+              </div>
+              <span class="text-xs">Webhook Dispatches</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/60 font-mono">HTTP LOGS</span>
           </button>
         </div>
       </div>
 
       <!-- Group 4: Master Settings -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Master Controls</p>
+        <div class="flex items-center gap-2 px-3 mb-2">
+          <span class="w-1 h-3 rounded-full bg-slate-500"></span>
+          <p class="text-[9px] uppercase tracking-widest font-black text-slate-400">Master Governance</p>
+        </div>
         <div class="space-y-1">
-          <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-brands fa-telegram text-sm text-slate-500 group-hover:text-sky-400"></i>
-            <span>Alerts & Bot Config</span>
+          <button onclick="switchTab('settings')" id="nav-settings" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-sky-400 group-hover:text-white">
+                <i class="fa-brands fa-telegram text-xs"></i>
+              </div>
+              <span class="text-xs">Alerts & Bot Config</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-sky-950/80 text-sky-300 border border-sky-800/60 font-mono">TELEGRAM</span>
           </button>
-          <button onclick="switchTab('security')" id="nav-security" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-key text-sm text-slate-500 group-hover:text-amber-300"></i>
-            <span>Password & Security</span>
+
+          <button onclick="switchTab('security')" id="nav-security" class="nav-item group">
+            <div class="flex items-center gap-2.5">
+              <div class="nav-icon-box text-amber-300 group-hover:text-white">
+                <i class="fa-solid fa-key text-xs"></i>
+              </div>
+              <span class="text-xs">Password & Security</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-800/60 font-mono">AUTH</span>
           </button>
         </div>
       </div>
 
     </div>
 
+    <!-- Live Server Telemetry Card in Sidebar -->
+    <div class="px-4 py-2 bg-[#050812] border-t border-slate-800/60">
+      <div class="p-3 rounded-2xl bg-slate-900/70 border border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <div>
+            <p class="text-[9px] font-mono text-slate-400 uppercase tracking-wider">Gateway Host</p>
+            <p class="text-xs font-black text-white font-mono">13.205.205.71</p>
+          </div>
+        </div>
+        <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800">ONLINE</span>
+      </div>
+    </div>
+
     <!-- Admin Profile Footer -->
-    <div class="p-4 border-t border-slate-800/70 bg-[#090d16]">
-      <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+    <div class="p-3.5 border-t border-slate-800/70 bg-[#070b14]">
+      <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900/90 border border-slate-800/90 shadow-md">
         <div class="flex items-center space-x-3 overflow-hidden">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-md">
             👑
           </div>
           <div class="overflow-hidden">
-            <p class="text-xs font-bold text-white truncate" id="admin-user-display">Super Admin</p>
-            <p class="text-[10px] text-emerald-400 font-mono">Master Clearance</p>
+            <p class="text-xs font-black text-white truncate" id="admin-user-display">Super Admin</p>
+            <p class="text-[10px] text-emerald-400 font-mono font-bold tracking-tight">Master Clearance</p>
           </div>
         </div>
-        <button onclick="logoutAdmin()" class="text-slate-400 hover:text-rose-400 transition p-1.5" title="Sign Out">
+        <button onclick="logoutAdmin()" class="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 p-2 rounded-xl transition" title="Sign Out">
           <i class="fa-solid fa-power-off text-sm"></i>
         </button>
       </div>
@@ -925,14 +1049,14 @@
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const nav = document.getElementById(`nav-${t}`);
-        if (nav) nav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group';
+        if (nav) nav.classList.remove('active');
       });
 
       const target = document.getElementById(`tab-${tabId}`);
       if (target) target.classList.remove('hidden');
 
       const activeNav = document.getElementById(`nav-${tabId}`);
-      if (activeNav) activeNav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600/15 border border-indigo-500/30 text-indigo-300 transition group';
+      if (activeNav) activeNav.classList.add('active');
 
       const titles = {
         overview: 'Operations Console',
