@@ -37,6 +37,8 @@ router.delete('/upi-pool/:id', adminController.deleteUpiVpa);
 // 7. Subscription Plans
 router.get('/plans', adminController.getPlans);
 router.post('/plans', adminController.savePlan);
+router.post('/plans/:id/toggle', adminController.togglePlan);
+router.delete('/plans/:id', adminController.deletePlan);
 
 // 8. Fraud Blacklist
 router.get('/blacklist', adminController.getBlacklist);

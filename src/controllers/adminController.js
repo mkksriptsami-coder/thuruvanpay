@@ -343,12 +343,38 @@ async function getPlans(req, res) {
 
 async function savePlan(req, res) {
   try {
-    const { name, price, validity_days, features } = req.body;
-    db.prepare('INSERT INTO subscription_plans (name, price, validity_days, features) VALUES (?, ?, ?, ?)')
-      .run(name, parseFloat(price), parseInt(validity_days), features || '');
-    return res.status(201).json({ status: true, message: 'Plan created successfully!' });
+    const { id, name, price, validity_days, features } = req.body;
+    if (id) {
+      db.prepare('UPDATE subscription_plans SET name = ?, price = ?, validity_days = ?, features = ? WHERE id = ?')
+        .run(name, parseFloat(price), parseInt(validity_days), features || '', id);
+      return res.status(200).json({ status: true, message: 'Plan updated successfully!' });
+    } else {
+      db.prepare('INSERT INTO subscription_plans (name, price, validity_days, features) VALUES (?, ?, ?, ?)')
+        .run(name, parseFloat(price), parseInt(validity_days), features || '');
+      return res.status(201).json({ status: true, message: 'Plan created successfully!' });
+    }
   } catch (error) {
     return res.status(500).json({ status: false, message: 'Error saving plan.' });
+  }
+}
+
+async function togglePlan(req, res) {
+  try {
+    const { id } = req.params;
+    db.prepare('UPDATE subscription_plans SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?').run(id);
+    return res.status(200).json({ status: true, message: 'Plan status updated!' });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: 'Error updating plan status.' });
+  }
+}
+
+async function deletePlan(req, res) {
+  try {
+    const { id } = req.params;
+    db.prepare('DELETE FROM subscription_plans WHERE id = ?').run(id);
+    return res.status(200).json({ status: true, message: 'Plan deleted successfully!' });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: 'Error deleting plan.' });
   }
 }
 
@@ -464,7 +490,7 @@ async function settlePayout(req, res) {
     const { id } = req.params;
     const { utr } = req.body;
     const now = new Date().toISOString();
-    db.prepare('UPDATE payout_requests SET status = "SETTLED", utr = ?, processed_at = ? WHERE id = ?')
+    db.prepare("UPDATE payout_requests SET status = 'SETTLED', utr = ?, processed_at = ? WHERE id = ?")
       .run(utr || `PAYOUT_${Date.now()}`, now, id);
     return res.status(200).json({ status: true, message: 'Payout marked as SETTLED!' });
   } catch (error) {
@@ -490,6 +516,8 @@ module.exports = {
   deleteUpiVpa,
   getPlans,
   savePlan,
+  togglePlan,
+  deletePlan,
   updateMerchantPlan,
   getBlacklist,
   addBlacklistIp,

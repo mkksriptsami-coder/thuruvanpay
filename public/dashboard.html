@@ -50,6 +50,10 @@
         <p class="text-xs text-slate-500 mt-0.5" id="merchant-email">loading credentials...</p>
       </div>
       <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+          <i class="fa-solid fa-crown text-amber-500"></i>
+          <span id="merchant-plan-text">PRO Plan</span>
+        </span>
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           Gateway Active
@@ -261,6 +265,9 @@
           currentMerchant = data.merchant;
           document.getElementById('merchant-name').textContent = currentMerchant.name;
           document.getElementById('merchant-email').textContent = currentMerchant.email;
+          if (document.getElementById('merchant-plan-text')) {
+            document.getElementById('merchant-plan-text').textContent = (currentMerchant.plan || 'PRO') + ' Plan';
+          }
 
           document.getElementById('stat-revenue').textContent = `₹${data.stats.totalRevenue.toFixed(2)}`;
           document.getElementById('stat-success').textContent = data.stats.successOrders;
