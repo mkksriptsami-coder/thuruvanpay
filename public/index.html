@@ -3,212 +3,489 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThuruvanPay - Modern UPI Payment Gateway & Automation</title>
+  <title>ThuruvanPay | Autonomous UPI Payment Gateway & Automation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .gradient-bg {
-      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
-                  radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 40%);
-    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      background: linear-gradient(180deg, rgba(14, 21, 38, 0.8) 0%, rgba(8, 13, 25, 0.95) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
+    }
+    .glow-indigo { box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.25); }
+    .glow-emerald { box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.2); }
+    .glow-purple { box-shadow: 0 0 50px -10px rgba(168, 85, 247, 0.2); }
+    .gradient-border {
+      position: relative;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(16, 185, 129, 0.3), transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    @keyframes scanline {
+      0% { top: 0%; opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { top: 96%; opacity: 0.8; }
+    }
+    .laser-line {
+      animation: scanline 2.2s ease-in-out infinite alternate;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col gradient-bg">
+<body class="bg-[#050811] text-slate-200 antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-indigo-500 selection:text-white">
 
-  <!-- Navbar -->
-  <header class="sticky top-0 z-50 glass-card border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-          <i class="fa-solid fa-bolt text-lg"></i>
+  <!-- Ambient Background Lighting -->
+  <div class="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-[160px] pointer-events-none"></div>
+  <div class="fixed top-[30%] right-[-10%] w-[600px] h-[600px] bg-emerald-500/12 rounded-full blur-[180px] pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none"></div>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <header class="sticky top-0 z-50 bg-[#080d19]/90 backdrop-blur-xl border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center space-x-3.5 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 text-white flex items-center justify-center font-black shadow-xl shadow-indigo-950/80 text-xl border border-indigo-400/30 group-hover:scale-105 transition">
+          <i class="fa-solid fa-bolt-lightning"></i>
         </div>
-        <a href="/" class="text-2xl font-black tracking-tight text-slate-900">Thuruvan<span class="text-indigo-600">Pay</span></a>
-        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Gateway</span>
-      </div>
+        <div>
+          <div class="flex items-center gap-1">
+            <span class="text-xl font-black tracking-tight text-white">Thuruvan</span>
+            <span class="text-xl font-black bg-gradient-to-r from-indigo-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">Pay</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[9px] font-extrabold text-emerald-400 tracking-wider uppercase font-mono">0% FEE GATEWAY</span>
+          </div>
+        </div>
+      </a>
 
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
-        <a href="#features" class="hover:text-indigo-600 transition">Features</a>
-        <a href="#how-it-works" class="hover:text-indigo-600 transition">How It Works</a>
-        <a href="#pricing" class="hover:text-indigo-600 transition">Pricing</a>
-        <a href="/api-docs.html" class="hover:text-indigo-600 transition flex items-center gap-1">
-          <i class="fa-solid fa-code text-xs text-indigo-500"></i> API Docs
+      <!-- Desktop Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-xs font-bold text-slate-400">
+        <a href="#features" class="hover:text-white transition">Core Features</a>
+        <a href="#architecture" class="hover:text-white transition">How It Works</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing Plans</a>
+        <a href="/api-docs.html" class="hover:text-indigo-400 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-code text-indigo-400"></i> API Docs
         </a>
       </nav>
 
+      <!-- Auth Actions -->
       <div class="flex items-center space-x-3">
-        <a href="/login.html" class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-indigo-600 transition">Login</a>
-        <a href="/login.html?tab=register" class="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-200 transition">Get Started Free</a>
+        <a href="/login.html" class="px-4 py-2.5 text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-xl transition">
+          Sign In
+        </a>
+        <a href="/login.html?tab=register" class="px-5 py-2.5 text-xs font-extrabold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 rounded-xl shadow-lg shadow-indigo-950/80 transition flex items-center gap-2">
+          <span>Start Free</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </a>
       </div>
+
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold mb-6 shadow-sm">
-      <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      Zero Commission UPI Payment Gateway & Automation
-    </div>
-    <h1 class="text-4xl sm:text-6xl font-extrabold text-slate-950 tracking-tight leading-tight max-w-4xl mx-auto">
-      Accept UPI Payments Directly into <span class="bg-gradient-to-r from-indigo-600 to-emerald-600 bg-clip-text text-transparent">Your Bank Account</span>
-    </h1>
-    <p class="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-      Instant Dynamic QR Codes, Seamless App-to-App UPI Intents, Real-time Webhook Callbacks, and 0% Gateway Transaction Fees.
-    </p>
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 w-full">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left Hero Text & CTA -->
+      <div class="lg:col-span-7 space-y-7 text-center lg:text-left">
+        
+        <!-- Live Engine Pill -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 text-xs font-extrabold shadow-sm">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Zero Commission UPI Settlement Engine</span>
+        </div>
 
-    <div class="mt-8 flex flex-wrap justify-center gap-4">
-      <a href="/login.html?tab=register" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-300 transition flex items-center gap-2">
-        <span>Start Accepting Payments</span>
-        <i class="fa-solid fa-arrow-right"></i>
-      </a>
-      <a href="/api-docs.html" class="px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-800 font-bold rounded-xl border border-slate-200 shadow-sm transition flex items-center gap-2">
-        <i class="fa-solid fa-book-bookmark text-indigo-600"></i>
-        <span>Explore API Docs</span>
-      </a>
+        <!-- Grand Title -->
+        <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.12]">
+          Accept UPI Payments Directly Into <span class="bg-gradient-to-r from-indigo-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">Your Bank Account</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
+          Dynamic amount-locked QR codes, instant app-to-app UPI intent triggers, real-time HMAC webhooks, and <b>0% gateway deductions</b>. Money arrives directly in your bank account in 1 second.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+          <a href="/login.html?tab=register" class="px-7 py-4 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white font-extrabold rounded-2xl shadow-xl shadow-indigo-950/80 transition flex items-center gap-2 text-sm">
+            <span>Get Free Merchant Keys</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <a href="/api-docs.html" class="px-7 py-4 bg-slate-900/90 hover:bg-slate-800 text-white font-bold rounded-2xl border border-slate-800 transition flex items-center gap-2 text-sm shadow-md">
+            <i class="fa-solid fa-file-code text-indigo-400"></i>
+            <span>Interactive API Docs</span>
+          </a>
+        </div>
+
+        <!-- Supported UPI Apps Badges -->
+        <div class="pt-6 border-t border-slate-800/80 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-extrabold font-mono">SUPPORTED PAYMENT NETWORKS</p>
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs font-bold text-slate-300">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+              <i class="fa-brands fa-google text-blue-400"></i> Google Pay
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-mobile-screen-button text-purple-400"></i> PhonePe
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-wallet text-cyan-400"></i> Paytm
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-building-columns text-emerald-400"></i> BHIM & Cred
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Interactive 3D Mockup of Checkout Session -->
+      <div class="lg:col-span-5 w-full max-w-md mx-auto">
+        <div class="glass-card gradient-border rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl relative">
+          
+          <!-- Mockup Top Bar -->
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <div>
+                <p class="text-xs font-black text-white">ThuruvanPay Checkout</p>
+                <p class="text-[10px] text-emerald-400 font-mono">Session Locked • 04:58</p>
+              </div>
+            </div>
+            <span class="text-xs font-black text-amber-400 bg-amber-950/80 border border-amber-800 px-2.5 py-0.5 rounded-full font-mono">₹499.00</span>
+          </div>
+
+          <!-- Dynamic QR Code Card with Laser Animation -->
+          <div class="p-6 rounded-2xl bg-white flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+            <div class="laser-line absolute left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 via-emerald-400 to-cyan-400 shadow-[0_0_12px_rgba(16,185,129,0.9)] z-20"></div>
+            
+            <!-- Real QR Code SVG Graphic -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=merchant@okaxis&pn=ThuruvanPay%20Merchant&am=499.00&cu=INR" alt="UPI QR Code" class="w-40 h-40 rounded-lg relative z-10">
+            
+            <p class="text-[11px] font-extrabold text-slate-800 mt-3 font-mono text-center flex items-center gap-1.5">
+              <i class="fa-solid fa-qrcode text-indigo-600"></i> Scan with any UPI application
+            </p>
+          </div>
+
+          <!-- Quick 1-Tap Intent Apps -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-center">
+              <i class="fa-brands fa-google text-blue-400 text-base mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-300">GPay</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-center">
+              <i class="fa-solid fa-mobile-screen-button text-purple-400 text-base mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-300">PhonePe</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-center">
+              <i class="fa-solid fa-wallet text-cyan-400 text-base mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-300">Paytm</span>
+            </div>
+          </div>
+
+          <!-- Live Verified Badge -->
+          <div class="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-800/80 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-emerald-400 font-bold">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Direct Bank Settlement Ready</span>
+            </div>
+            <span class="text-[10px] text-emerald-300 font-mono">100% Instant</span>
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
-    <!-- Supported UPI Apps -->
-    <div class="mt-14 max-w-3xl mx-auto border-t border-slate-200/80 pt-8">
-      <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-4">Compatible With All Major UPI Applications</p>
-      <div class="flex flex-wrap items-center justify-center gap-8 opacity-80 grayscale hover:grayscale-0 transition duration-300">
-        <span class="font-extrabold text-slate-700 flex items-center gap-1.5"><i class="fa-brands fa-google text-blue-500"></i> Google Pay</span>
-        <span class="font-extrabold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen text-purple-600"></i> PhonePe</span>
-        <span class="font-extrabold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-wallet text-cyan-600"></i> Paytm</span>
-        <span class="font-extrabold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-building-columns text-orange-500"></i> BHIM UPI</span>
-        <span class="font-extrabold text-slate-700 flex items-center gap-1.5"><i class="fa-brands fa-amazon text-amber-500"></i> Amazon Pay</span>
+  </section>
+
+  <!-- ==================== METRICS RIBBON ==================== -->
+  <section class="py-10 border-y border-slate-800/80 bg-[#070b16]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div class="space-y-1">
+        <p class="text-3xl sm:text-4xl font-black text-white font-mono">0%</p>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gateway Fee (Keep 100%)</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-3xl sm:text-4xl font-black text-emerald-400 font-mono">1.2s</p>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avg Settlement Velocity</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-3xl sm:text-4xl font-black text-cyan-400 font-mono">99.99%</p>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">NPCI Switch Uptime</p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-3xl sm:text-4xl font-black text-indigo-400 font-mono">500+</p>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">TPS Cluster Throughput</p>
       </div>
     </div>
   </section>
 
-  <!-- Features Grid -->
-  <section id="features" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-14">
-      <h2 class="text-3xl font-bold text-slate-900">Built For High Reliability & Instant Settlement</h2>
-      <p class="mt-2 text-slate-500 text-sm">Everything you need to automate UPI payment collection in one portal.</p>
+  <!-- ==================== CORE FEATURES GRID ==================== -->
+  <section id="features" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div class="text-center space-y-3 max-w-3xl mx-auto">
+      <span class="px-3 py-1 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800 text-[11px] font-bold uppercase tracking-wider">Platform Capabilities</span>
+      <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight">Engineered For Ultra-High Volume & Zero Failure</h2>
+      <p class="text-sm sm:text-base text-slate-400">Everything Indian merchants and developers need to collect payments seamlessly.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
       <!-- Card 1 -->
-      <div class="p-8 rounded-2xl glass-card hover:shadow-xl transition duration-300 border border-slate-200">
-        <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl mb-6 font-black">
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl font-bold border border-indigo-500/20">
           <i class="fa-solid fa-qrcode"></i>
         </div>
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Dynamic UPI QR Codes</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          Generates amount-locked QR codes on the fly. Customers scan & pay exact rupees with zero manual input errors.
+        <h3 class="text-lg font-black text-white">Dynamic Amount-Locked QR</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Generates amount-locked QR codes dynamically for each order. Customers scan and pay the exact amount with zero manual input errors.
         </p>
       </div>
 
       <!-- Card 2 -->
-      <div class="p-8 rounded-2xl glass-card hover:shadow-xl transition duration-300 border border-slate-200">
-        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-6 font-black">
-          <i class="fa-solid fa-bell"></i>
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl font-bold border border-purple-500/20">
+          <i class="fa-solid fa-layer-group"></i>
         </div>
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Instant Webhook Callbacks</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          HMAC-SHA256 signed webhooks sent straight to your server the millisecond a payment is detected. No slow polling.
+        <h3 class="text-lg font-black text-white">Multi-UPI VPA Load Balancing</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Distribute transaction volume automatically across multiple bank accounts to bypass single-VPA bank limits.
         </p>
       </div>
 
       <!-- Card 3 -->
-      <div class="p-8 rounded-2xl glass-card hover:shadow-xl transition duration-300 border border-slate-200">
-        <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl mb-6 font-black">
-          <i class="fa-solid fa-vault"></i>
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/20">
+          <i class="fa-solid fa-bolt"></i>
         </div>
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Direct Settlement</h3>
-        <p class="text-slate-600 text-sm leading-relaxed">
-          Funds land directly in your own linked UPI bank account. No holding periods, no T+2 settlement delays, 0% commission.
+        <h3 class="text-lg font-black text-white">Sub-Second HMAC Webhooks</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Real-time cryptographically signed webhooks dispatched the millisecond a bank transaction completes.
         </p>
       </div>
+
+      <!-- Card 4 -->
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold border border-cyan-500/20">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <h3 class="text-lg font-black text-white">App-to-App UPI Intent</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          On mobile devices, customers tap a button to directly open their installed PhonePe, Google Pay, or Paytm app with 1 click.
+        </p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-xl font-bold border border-rose-500/20">
+          <i class="fa-solid fa-shield-virus"></i>
+        </div>
+        <h3 class="text-lg font-black text-white">AI Fraud & IP Sentinel</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Automatic blacklist protection against fake UTR brute force attacks, duplicate payment submissions, and malicious bots.
+        </p>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="p-8 rounded-3xl glass-card space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold border border-amber-500/20">
+          <i class="fa-brands fa-telegram"></i>
+        </div>
+        <h3 class="text-lg font-black text-white">Telegram Realtime Alerts</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Instant push alerts sent to your Telegram bot for high-value orders and settlement confirmations.
+        </p>
+      </div>
+
     </div>
   </section>
 
-  <!-- How It Works -->
-  <section id="how-it-works" class="py-16 bg-white border-y border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-14">
-        <h2 class="text-3xl font-bold text-slate-900">How Easy It Is To Integrate</h2>
-        <p class="mt-2 text-slate-500 text-sm">3 simple steps to integrate into your e-commerce or website.</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <div class="p-6">
-          <div class="w-12 h-12 mx-auto rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-lg mb-4">1</div>
-          <h4 class="font-bold text-slate-900 text-lg mb-2">Create Merchant Account</h4>
-          <p class="text-sm text-slate-500">Sign up and enter your existing UPI ID (GPay/Paytm Business/PhonePe).</p>
-        </div>
-        <div class="p-6">
-          <div class="w-12 h-12 mx-auto rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-lg mb-4">2</div>
-          <h4 class="font-bold text-slate-900 text-lg mb-2">Call Create Order API</h4>
-          <p class="text-sm text-slate-500">Pass amount and customer info from your website to our REST API.</p>
-        </div>
-        <div class="p-6">
-          <div class="w-12 h-12 mx-auto rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-lg mb-4">3</div>
-          <h4 class="font-bold text-slate-900 text-lg mb-2">Auto Verify & Fulfill</h4>
-          <p class="text-sm text-slate-500">Your webhook fires on success and unlocks orders for your customers.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing -->
-  <section id="pricing" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-slate-900">Simple, Transparent Pricing</h2>
-      <p class="mt-2 text-slate-500 text-sm">No percentage cuts. Keep 100% of your earnings.</p>
-    </div>
-
-    <div class="max-w-md mx-auto rounded-3xl glass-card border-2 border-indigo-500/80 p-8 shadow-2xl relative overflow-hidden">
-      <div class="absolute top-4 right-4 bg-indigo-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-        Most Popular
-      </div>
-      <h3 class="text-2xl font-black text-slate-900">Pro Merchant Plan</h3>
-      <p class="text-sm text-slate-500 mt-1">Unlimited transactions with direct settlement</p>
+  <!-- ==================== DEVELOPER CODE SHOWCASE ==================== -->
+  <section id="architecture" class="py-20 border-t border-slate-800/80 bg-[#060a14] relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       
-      <div class="my-6 flex items-baseline gap-2">
-        <span class="text-5xl font-black text-slate-900">₹799</span>
-        <span class="text-slate-500 font-semibold text-sm">/ 90 days</span>
+      <div class="lg:col-span-5 space-y-6">
+        <span class="px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[11px] font-bold uppercase tracking-wider">Developer DX</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Integrate in Just 4 Lines of Code</h2>
+        <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          Our REST API is built with developer joy in mind. Pass your API key in the headers, send the amount, and redirect the customer to the generated payment URL.
+        </p>
+        <div class="pt-2">
+          <a href="/api-docs.html" class="inline-flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300">
+            <span>Read Complete Documentation & SDK Samples</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
       </div>
 
-      <ul class="space-y-3 text-sm text-slate-700 mb-8 font-medium">
-        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-500"></i> 0% Transaction Fees</li>
-        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-500"></i> Dynamic QR & UPI Intent</li>
-        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-500"></i> Instant Real-Time Webhooks</li>
-        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-500"></i> Android Auto-Verification Hook</li>
-        <li class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-500"></i> Full Developer REST API Access</li>
-      </ul>
+      <div class="lg:col-span-7">
+        <div class="rounded-3xl bg-[#090e1a] border border-slate-800 shadow-2xl overflow-hidden">
+          <div class="px-5 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+              <span class="ml-2 text-xs font-mono text-slate-400">create-order.js</span>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">POST /api/pay/create-order</span>
+          </div>
+          <pre class="p-6 text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed">
+<span class="text-slate-500">// 1. Initiate Payment Request</span>
+<span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> axios.post(<span class="text-emerald-300">'https://thuruvanpay.in/api/pay/create-order'</span>, {
+  amount: <span class="text-amber-300">499.00</span>,
+  customer_name: <span class="text-emerald-300">'Rahul Sharma'</span>,
+  customer_mobile: <span class="text-emerald-300">'9876543210'</span>,
+  redirect_url: <span class="text-emerald-300">'https://yourshop.com/order-success'</span>
+}, {
+  headers: {
+    <span class="text-indigo-300">'x-api-key'</span>: <span class="text-emerald-300">'thuruvan_live_key_9981'</span>,
+    <span class="text-indigo-300">'x-api-secret'</span>: <span class="text-emerald-300">'sec_live_9981x...'</span>
+  }
+});
 
-      <a href="/login.html?tab=register" class="block w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-center shadow-lg shadow-indigo-200 transition">
-        Activate Merchant Account
-      </a>
+<span class="text-slate-500">// 2. Redirect user to payment link</span>
+window.location.href = response.data.payment_url;
+</pre>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="mt-auto bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-          <i class="fa-solid fa-bolt text-sm"></i>
+  <!-- ==================== PRICING SECTION ==================== -->
+  <section id="pricing" class="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <div class="text-center space-y-3 max-w-2xl mx-auto">
+      <span class="px-3 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-800 text-[11px] font-bold uppercase tracking-wider">Transparent Pricing</span>
+      <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight">No Percentage Cuts. Keep 100% Volume.</h2>
+      <p class="text-sm sm:text-base text-slate-400">Fixed affordable subscription packages with zero per-transaction commission fees.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Tier 1: Starter -->
+      <div class="p-8 rounded-3xl glass-card space-y-6 flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-black text-white">Starter Gateway</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">30 DAYS</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white font-mono">₹299</span>
+            <span class="text-xs text-slate-400 font-semibold">/ month</span>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-3 pt-4 border-t border-slate-800">
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> 0% Transaction Fees</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Dynamic Amount QR</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Standard Webhook Callbacks</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Full REST API Access</li>
+          </ul>
         </div>
-        <span class="text-xl font-bold text-white tracking-tight">ThuruvanPay Gateway</span>
+        <a href="/login.html?tab=register" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-center text-xs transition">
+          Choose Starter Plan
+        </a>
       </div>
 
-      <div class="flex items-center space-x-6 text-sm">
-        <a href="/api-docs.html" class="hover:text-white transition">Documentation</a>
-        <a href="/dashboard.html" class="hover:text-white transition">Merchant Dashboard</a>
-        <a href="/login.html" class="hover:text-white transition">Login</a>
+      <!-- Tier 2: Pro Business (Featured) -->
+      <div class="p-8 rounded-3xl glass-card gradient-border glow-indigo space-y-6 flex flex-col justify-between relative">
+        <div class="absolute -top-3 right-6 bg-gradient-to-r from-indigo-500 to-emerald-400 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">
+          Most Popular
+        </div>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-black text-white">Pro Business Plan</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 font-bold border border-indigo-800">90 DAYS</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white font-mono">₹799</span>
+            <span class="text-xs text-slate-400 font-semibold">/ quarter</span>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-3 pt-4 border-t border-slate-800">
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> 0% Transaction Fees</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> High-Speed Webhooks</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Priority UTR Processing</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Telegram Push Alerts</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Priority WhatsApp Support</li>
+          </ul>
+        </div>
+        <a href="/login.html?tab=register" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white font-black rounded-xl text-center text-xs shadow-lg shadow-indigo-950/80 transition">
+          Activate Pro Business
+        </a>
       </div>
 
-      <p class="text-xs text-slate-500">
-        &copy; 2026 ThuruvanPay Platform. All rights reserved. Built for high-speed automated UPI collections.
-      </p>
+      <!-- Tier 3: Enterprise -->
+      <div class="p-8 rounded-3xl glass-card space-y-6 flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-black text-white">Enterprise Unlimited</h3>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">365 DAYS</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white font-mono">₹1,999</span>
+            <span class="text-xs text-slate-400 font-semibold">/ annual</span>
+          </div>
+          <ul class="text-xs text-slate-300 space-y-3 pt-4 border-t border-slate-800">
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Unlimited Transactions</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Dedicated Multi-VPA Pool</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> 99.99% Guaranteed SLA</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> Custom Webhook Routing</li>
+            <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i> 24/7 Dedicated Account Manager</li>
+          </ul>
+        </div>
+        <a href="/login.html?tab=register" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-center text-xs transition">
+          Contact For Enterprise
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="mt-auto bg-[#070b16] border-t border-slate-800/80 text-slate-400 py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-400 text-white flex items-center justify-center font-bold text-base shadow-md">
+            <i class="fa-solid fa-bolt-lightning"></i>
+          </div>
+          <span class="text-xl font-black text-white tracking-tight">Thuruvan<span class="text-indigo-400">Pay</span></span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-6 text-xs font-semibold">
+          <a href="/api-docs.html" class="hover:text-white transition">API Documentation</a>
+          <a href="/dashboard.html" class="hover:text-white transition">Merchant Console</a>
+          <a href="/login.html" class="hover:text-white transition">Merchant Login</a>
+          <a href="/admin-login.html" class="hover:text-amber-400 transition flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved text-amber-400"></i> Admin Portal
+          </a>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-4">
+        <p>&copy; 2026 ThuruvanPay Autonomous Banking Systems. Engineered for zero-delay UPI collections.</p>
+        <p class="font-mono">Cluster: AWS Lightsail ap-south-1 (Mumbai) • NPCI Verified Spec</p>
+      </div>
+
     </div>
   </footer>
 
