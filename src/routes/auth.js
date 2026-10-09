@@ -8,5 +8,7 @@ router.get('/dashboard', authController.authMiddleware, authController.getDashbo
 router.put('/settings', authController.authMiddleware, authController.updateSettings);
 router.post('/regenerate-keys', authController.authMiddleware, authController.regenerateKeys);
 router.post('/change-plan', authController.authMiddleware, authController.changeMerchantPlan);
+router.put('/profile', authController.authMiddleware, authController.updateProfile);
+router.post('/change-password', authController.authMiddleware, authController.changePassword);
 
 module.exports = router;

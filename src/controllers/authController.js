@@ -270,6 +270,56 @@ async function changeMerchantPlan(req, res) {
   }
 }
 
+// Update Merchant Profile
+async function updateProfile(req, res) {
+  try {
+    const { name, phone, upi_name, upi_vpa, webhook_url } = req.body;
+
+    const stmt = db.prepare(`
+      UPDATE merchants 
+      SET name = COALESCE(?, name),
+          phone = COALESCE(?, phone),
+          upi_name = COALESCE(?, upi_name),
+          upi_vpa = COALESCE(?, upi_vpa),
+          webhook_url = COALESCE(?, webhook_url)
+      WHERE id = ?
+    `);
+
+    stmt.run(name, phone, upi_name, upi_vpa, webhook_url, req.user.id);
+    return res.status(200).json({ status: true, message: 'Profile details updated successfully!' });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: 'Failed to update profile.' });
+  }
+}
+
+// Change Merchant Password
+async function changePassword(req, res) {
+  try {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password) {
+      return res.status(400).json({ status: false, message: 'Current and new password are required.' });
+    }
+
+    const merchant = db.prepare('SELECT password_hash FROM merchants WHERE id = ?').get(req.user.id);
+    if (!merchant) {
+      return res.status(404).json({ status: false, message: 'Merchant not found.' });
+    }
+
+    const isMatch = await bcrypt.compare(current_password, merchant.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ status: false, message: 'Current password is incorrect.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(new_password, salt);
+    db.prepare('UPDATE merchants SET password_hash = ? WHERE id = ?').run(hash, req.user.id);
+
+    return res.status(200).json({ status: true, message: 'Password updated successfully!' });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: 'Failed to update password.' });
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -277,5 +327,7 @@ module.exports = {
   getDashboardData,
   updateSettings,
   regenerateKeys,
-  changeMerchantPlan
+  changeMerchantPlan,
+  updateProfile,
+  changePassword
 };

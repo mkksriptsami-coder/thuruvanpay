@@ -110,6 +110,11 @@
           <span>Merchants / UPI</span>
         </button>
 
+        <button onclick="openProfileModal('general')" id="nav-profile" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
+          <i class="fa-solid fa-id-card text-sm w-4 text-center text-emerald-500"></i>
+          <span>Merchant Profile</span>
+        </button>
+
         <button onclick="switchTab('transactions')" id="nav-transactions" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white transition">
           <i class="fa-solid fa-receipt text-sm w-4 text-center"></i>
           <span>Transactions</span>
@@ -210,17 +215,65 @@
           </div>
         </div>
 
-        <!-- User Profile Pill (Matches reference screenshot) -->
-        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-slate-800">
-          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-sm" id="user-avatar">
-            M
-          </div>
-          <div class="hidden sm:block text-left leading-tight">
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-black text-slate-900 dark:text-white font-mono" id="top-user-id">UID_00001</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        <!-- User Profile Dropdown (Matches reference screenshot) -->
+        <div class="relative">
+          <button onclick="toggleUserDropdown(event)" id="user-profile-btn" class="flex items-center gap-2.5 pl-2 border-l border-slate-200 dark:border-slate-800 hover:opacity-90 transition focus:outline-none cursor-pointer group py-1">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white flex items-center justify-center font-black text-sm shadow-sm border border-indigo-400/30 group-hover:scale-105 transition" id="user-avatar">
+              M
             </div>
-            <span class="text-[10px] font-bold text-slate-400 block" id="top-user-role">Role : User</span>
+            <div class="hidden sm:block text-left leading-tight">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-black text-slate-900 dark:text-white font-mono" id="top-user-id">UID_00001</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-slate-200 transition"></i>
+              </div>
+              <span class="text-[10px] font-bold text-slate-400 block" id="top-user-role">Role : Merchant</span>
+            </div>
+          </button>
+
+          <!-- User Dropdown Menu -->
+          <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-72 bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-3 space-y-2 z-50">
+            <!-- Header with user details -->
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white flex items-center justify-center font-black text-base shadow-sm" id="dropdown-avatar">
+                M
+              </div>
+              <div class="overflow-hidden">
+                <p class="text-xs font-black text-slate-900 dark:text-white truncate" id="dropdown-name">Merchant Name</p>
+                <p class="text-[10px] text-slate-400 font-mono truncate" id="dropdown-email">merchant@email.com</p>
+                <span class="inline-block mt-1 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 font-mono" id="dropdown-plan-badge">PRO PLAN</span>
+              </div>
+            </div>
+
+            <!-- Links list -->
+            <div class="space-y-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <button onclick="openProfileModal('general')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-left transition">
+                <i class="fa-solid fa-user-pen text-indigo-500 w-4"></i>
+                <span>Profile & Account Settings</span>
+              </button>
+
+              <button onclick="openProfileModal('settlement')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-left transition">
+                <i class="fa-solid fa-building-columns text-emerald-500 w-4"></i>
+                <span>Bank & Settlement Info</span>
+              </button>
+
+              <button onclick="openProfileModal('security')" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-left transition">
+                <i class="fa-solid fa-shield-halved text-amber-500 w-4"></i>
+                <span>Change Password & Security</span>
+              </button>
+
+              <button onclick="openSubscriptionModal(); closeUserDropdown();" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-left transition">
+                <i class="fa-solid fa-crown text-purple-500 w-4"></i>
+                <span>My Subscription Tier</span>
+              </button>
+            </div>
+
+            <!-- Divider & Logout -->
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button onclick="logout()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-left font-extrabold text-xs transition">
+                <i class="fa-solid fa-arrow-right-from-bracket w-4"></i>
+                <span>Logout Session</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -585,6 +638,190 @@
 
   </div>
 
+  <!-- ==================== MODAL: MERCHANT PROFILE (MATCHING PROFILE.PHP) ==================== -->
+  <div id="profile-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Top Bar -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg font-bold border border-indigo-200 dark:border-indigo-800">
+            <i class="fa-solid fa-id-card"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white text-lg">Merchant Profile Management</h3>
+            <p class="text-xs text-slate-400">Account settings, settlement details & security preferences</p>
+          </div>
+        </div>
+        <button onclick="closeProfileModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center text-lg">&times;</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 overflow-x-auto text-xs font-bold">
+        <button type="button" onclick="switchProfileTab('general')" id="tab-btn-general" class="px-4 py-2 rounded-xl transition bg-indigo-600 text-white shadow-sm flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-user"></i> <span>General Profile</span>
+        </button>
+        <button type="button" onclick="switchProfileTab('settlement')" id="tab-btn-settlement" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-building-columns"></i> <span>Bank & Settlement</span>
+        </button>
+        <button type="button" onclick="switchProfileTab('security')" id="tab-btn-security" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-lock"></i> <span>Change Password</span>
+        </button>
+        <button type="button" onclick="switchProfileTab('subscription')" id="tab-btn-subscription" class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 shrink-0">
+          <i class="fa-solid fa-crown text-amber-500"></i> <span>Subscription</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: GENERAL PROFILE -->
+      <div id="profile-tab-general" class="space-y-4">
+        <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Merchant UID (Immutable)</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="prof-uid" readonly class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                <button type="button" onclick="copyToClipboard('prof-uid')" class="p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl text-xs"><i class="fa-regular fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Account Status</label>
+              <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Active & Verified</span>
+                <span class="text-[10px] font-mono">0% DEDUCTION</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Full Merchant Name *</label>
+              <input type="text" id="prof-name" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Email Address (Registered)</label>
+              <input type="email" id="prof-email" readonly class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-600 dark:text-slate-400">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Contact Phone / Mobile</label>
+              <input type="tel" id="prof-phone" placeholder="9876543210" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Business / Brand Name</label>
+              <input type="text" id="prof-business-name" placeholder="Thuruvan Communications" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btn-save-profile" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-emerald-500 hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Save Profile Changes</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 2: BANK & SETTLEMENT -->
+      <div id="profile-tab-settlement" class="space-y-4 hidden">
+        <form onsubmit="handleUpdateSettlement(event)" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Receiver UPI VPA (Direct Bank Destination) *</label>
+            <input type="text" id="prof-upi-vpa" required placeholder="nkksriptsami-2@oksbi" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+            <p class="text-[10px] text-slate-400 mt-1">Funds from customer payments will be directly credited to this UPI VPA instantly.</p>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Payee Name Displayed in UPI Apps *</label>
+            <input type="text" id="prof-upi-name" required placeholder="THURUVAN COMMUNICATION" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Instant Webhook Notification URL</label>
+            <input type="url" id="prof-webhook-url" placeholder="https://yourwebsite.com/api/payment-webhook" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btn-save-settlement" class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-building-columns"></i>
+              <span>Update Settlement Info</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 3: SECURITY & CHANGE PASSWORD -->
+      <div id="profile-tab-security" class="space-y-4 hidden">
+        <form onsubmit="handleChangePassword(event)" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Current Password *</label>
+            <div class="relative">
+              <input type="password" id="pwd-current" required placeholder="Enter existing password" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+              <button type="button" onclick="togglePasswordInput('pwd-current', 'icon-pwd-curr')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i id="icon-pwd-curr" class="fa-regular fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">New Password *</label>
+            <div class="relative">
+              <input type="password" id="pwd-new" required minlength="6" placeholder="Minimum 6 characters" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+              <button type="button" onclick="togglePasswordInput('pwd-new', 'icon-pwd-new')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i id="icon-pwd-new" class="fa-regular fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">Confirm New Password *</label>
+            <div class="relative">
+              <input type="password" id="pwd-confirm" required minlength="6" placeholder="Repeat new password" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500">
+              <button type="button" onclick="togglePasswordInput('pwd-confirm', 'icon-pwd-conf')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <i id="icon-pwd-conf" class="fa-regular fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btn-change-pwd" class="px-6 py-3 bg-gradient-to-r from-amber-600 to-rose-600 hover:opacity-95 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-lock"></i>
+              <span>Update Password</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB 4: SUBSCRIPTION & LIMITS -->
+      <div id="profile-tab-subscription" class="space-y-5 hidden">
+        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Plan</span>
+            <span class="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 font-extrabold text-xs" id="prof-sub-plan">Enterprise Plan</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-500">Renewal Cycle:</span>
+            <span class="font-mono font-bold text-slate-800 dark:text-slate-200" id="prof-sub-renewal">08 Nov, 2026</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-500">Monthly Transaction Quota:</span>
+            <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" id="prof-sub-limit">10,000,000 Quota</span>
+          </div>
+        </div>
+
+        <button onclick="closeProfileModal(); openSubscriptionModal();" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-crown text-amber-400"></i>
+          <span>Change / Upgrade Subscription Plan</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ==================== MODAL: CREATE PAYLINK ==================== -->
   <div id="paylink-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5">
@@ -858,6 +1095,12 @@
           document.getElementById('top-user-id').textContent = currentMerchant.uid || `UID_${String(currentMerchant.id).padStart(5, '0')}`;
           document.getElementById('top-user-role').textContent = `Role : Merchant (${currentMerchant.plan || 'Starter'})`;
           document.getElementById('welcome-vpa-text').textContent = `Receiver VPA: ${currentMerchant.upi_vpa || 'Not Configured'} • Bank Direct Credit Active`;
+
+          // Populate Dropdown Card
+          if (document.getElementById('dropdown-avatar')) document.getElementById('dropdown-avatar').textContent = mName.charAt(0).toUpperCase();
+          if (document.getElementById('dropdown-name')) document.getElementById('dropdown-name').textContent = mName;
+          if (document.getElementById('dropdown-email')) document.getElementById('dropdown-email').textContent = currentMerchant.email;
+          if (document.getElementById('dropdown-plan-badge')) document.getElementById('dropdown-plan-badge').textContent = `${(currentMerchant.plan || 'Starter').toUpperCase()} PLAN`;
 
           // Populate 4 Metric Cards
           document.getElementById('stat-success-amt').textContent = `₹ ${(data.stats.successAmount || 0).toFixed(2)}`;
@@ -1289,6 +1532,192 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-qrcode"></i> <span>Open Live Checkout Page</span>`;
+      }
+    }
+
+    // User Dropdown Handlers
+    function toggleUserDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function closeUserDropdown() {
+      const menu = document.getElementById('user-dropdown-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    // Close Dropdowns on Click Outside
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('user-dropdown-menu');
+      const btn = document.getElementById('user-profile-btn');
+      if (menu && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+      const notifMenu = document.getElementById('notifications-menu');
+      if (notifMenu && !notifMenu.contains(e.target) && !e.target.closest('[onclick="toggleNotifications()"]')) {
+        notifMenu.classList.add('hidden');
+      }
+    });
+
+    // Profile Modal Handlers (Matching Zapupi profile.php)
+    function openProfileModal(tab = 'general') {
+      closeUserDropdown();
+      if (currentMerchant) {
+        document.getElementById('prof-uid').value = currentMerchant.uid || `UID_${String(currentMerchant.id).padStart(5, '0')}`;
+        document.getElementById('prof-name').value = currentMerchant.name || '';
+        document.getElementById('prof-email').value = currentMerchant.email || '';
+        document.getElementById('prof-phone').value = currentMerchant.phone || '';
+        document.getElementById('prof-business-name').value = currentMerchant.upi_name || '';
+        document.getElementById('prof-upi-vpa').value = currentMerchant.upi_vpa || '';
+        document.getElementById('prof-upi-name').value = currentMerchant.upi_name || '';
+        document.getElementById('prof-webhook-url').value = currentMerchant.webhook_url || '';
+        document.getElementById('prof-sub-plan').textContent = `${(currentMerchant.plan || 'Starter')} Plan`;
+        document.getElementById('prof-sub-renewal').textContent = document.getElementById('sub-card-renewal').textContent;
+        document.getElementById('prof-sub-limit').textContent = `${document.getElementById('sub-card-limit').textContent} Quota`;
+      }
+      switchProfileTab(tab);
+      document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function switchProfileTab(tab) {
+      const tabs = ['general', 'settlement', 'security', 'subscription'];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`profile-tab-${t}`);
+        const btnEl = document.getElementById(`tab-btn-${t}`);
+        if (tabEl) tabEl.classList.toggle('hidden', t !== tab);
+        if (btnEl) {
+          if (t === tab) {
+            btnEl.className = 'px-4 py-2 rounded-xl transition bg-indigo-600 text-white shadow-sm flex items-center gap-2 shrink-0';
+          } else {
+            btnEl.className = 'px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 shrink-0';
+          }
+        }
+      });
+    }
+
+    function togglePasswordInput(inputId, iconId) {
+      const inp = document.getElementById(inputId);
+      const ico = document.getElementById(iconId);
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.className = 'fa-regular fa-eye-slash text-xs text-indigo-500';
+      } else {
+        inp.type = 'password';
+        ico.className = 'fa-regular fa-eye text-xs text-slate-400';
+      }
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('prof-name').value.trim();
+      const phone = document.getElementById('prof-phone').value.trim();
+      const upi_name = document.getElementById('prof-business-name').value.trim();
+      const btn = document.getElementById('btn-save-profile');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Saving...</span>`;
+
+      try {
+        const res = await fetch('/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, phone, upi_name })
+        });
+        const data = await res.json();
+        if (data.status) {
+          showToast(data.message || 'Profile saved successfully!');
+          loadDashboard();
+        } else {
+          showToast(data.message || 'Error updating profile', 'error');
+        }
+      } catch(err) {
+        showToast('Network error updating profile', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Save Profile Changes</span>`;
+      }
+    }
+
+    async function handleUpdateSettlement(e) {
+      e.preventDefault();
+      const upi_vpa = document.getElementById('prof-upi-vpa').value.trim();
+      const upi_name = document.getElementById('prof-upi-name').value.trim();
+      const webhook_url = document.getElementById('prof-webhook-url').value.trim();
+      const btn = document.getElementById('btn-save-settlement');
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Updating...</span>`;
+
+      try {
+        const res = await fetch('/auth/settings', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ upi_vpa, upi_name, webhook_url })
+        });
+        const data = await res.json();
+        if (data.status) {
+          showToast('Settlement details updated successfully!');
+          loadDashboard();
+        } else {
+          showToast(data.message || 'Error updating settlement', 'error');
+        }
+      } catch(err) {
+        showToast('Network error updating settlement', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-building-columns"></i> <span>Update Settlement Info</span>`;
+      }
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const current_password = document.getElementById('pwd-current').value;
+      const new_password = document.getElementById('pwd-new').value;
+      const confirm_password = document.getElementById('pwd-confirm').value;
+      const btn = document.getElementById('btn-change-pwd');
+
+      if (new_password !== confirm_password) {
+        showToast('New password and confirm password do not match!', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Updating Password...</span>`;
+
+      try {
+        const res = await fetch('/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ current_password, new_password })
+        });
+        const data = await res.json();
+        if (data.status) {
+          showToast(data.message || 'Password changed successfully!');
+          document.getElementById('pwd-current').value = '';
+          document.getElementById('pwd-new').value = '';
+          document.getElementById('pwd-confirm').value = '';
+        } else {
+          showToast(data.message || 'Error changing password', 'error');
+        }
+      } catch(err) {
+        showToast('Network error updating password', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>Update Password</span>`;
       }
     }
 
