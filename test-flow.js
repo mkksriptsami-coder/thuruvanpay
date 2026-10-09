@@ -48,9 +48,10 @@ async function testGateway() {
   console.log('Public Order Details Status:', pubRes.data.data.status, 'Amount: ₹' + pubRes.data.data.amount);
 
   console.log('--- STEP 5: VERIFY PAYMENT (SIMULATING UTR SUBMIT / AUTO-VERIFICATION) ---');
+  const randomUtr = '42' + Date.now().toString().slice(-10);
   const utrRes = await axios.post(`${BASE}/api/pay/verify-utr`, {
     order_id: orderData.order_id,
-    utr: '428910284719'
+    utr: randomUtr
   });
   console.log('UTR Verification Result:', utrRes.data.message);
 

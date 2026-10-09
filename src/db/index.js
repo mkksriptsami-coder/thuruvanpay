@@ -69,6 +69,52 @@ function initDatabase() {
       created_at TEXT DEFAULT (datetime('now', 'localtime'))
     );
 
+    CREATE TABLE IF NOT EXISTS upi_pool (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vpa TEXT NOT NULL UNIQUE,
+      display_name TEXT NOT NULL,
+      daily_limit REAL DEFAULT 100000.0,
+      today_volume REAL DEFAULT 0.0,
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS subscription_plans (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      price REAL NOT NULL,
+      validity_days INTEGER NOT NULL,
+      transaction_limit INTEGER DEFAULT -1,
+      features TEXT DEFAULT '',
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS security_blacklist (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ip_address TEXT NOT NULL UNIQUE,
+      reason TEXT NOT NULL,
+      blocked_at TEXT DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS system_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS payout_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      merchant_id INTEGER NOT NULL,
+      amount REAL NOT NULL,
+      bank_account TEXT NOT NULL,
+      ifsc TEXT NOT NULL,
+      status TEXT DEFAULT 'PENDING',
+      utr TEXT,
+      requested_at TEXT DEFAULT (datetime('now', 'localtime')),
+      processed_at TEXT,
+      FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_merchants_api_key ON merchants(api_key);
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
     CREATE INDEX IF NOT EXISTS idx_orders_merchant_id ON orders(merchant_id);
@@ -81,6 +127,31 @@ function initDatabase() {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync('Admin@123', salt);
     db.prepare("INSERT INTO admins (email, password_hash, name) VALUES ('admin@thuruvanpay.in', ?, 'Master Administrator')").run(hash);
+  }
+
+  // Seed default plans if not exists
+  const planCheck = db.prepare("SELECT count(*) as count FROM subscription_plans").get();
+  if (planCheck.count === 0) {
+    db.exec(`
+      INSERT INTO subscription_plans (name, price, validity_days, features) VALUES 
+      ('Starter Gateway', 299, 30, '0% Fee, Dynamic QR, Standard Webhooks'),
+      ('Pro Business Plan', 799, 90, '0% Fee, Dynamic QR, High-Speed Webhooks, Priority UTR'),
+      ('Enterprise Unlimited', 1999, 365, 'Unlimited Transactions, Dedicated VPA Pool, 24/7 SLA');
+    `);
+  }
+
+  // Seed default settings if not exists
+  const settingCheck = db.prepare("SELECT count(*) as count FROM system_settings").get();
+  if (settingCheck.count === 0) {
+    db.exec(`
+      INSERT INTO system_settings (key, value) VALUES
+      ('telegram_bot_token', ''),
+      ('telegram_chat_id', ''),
+      ('alert_min_amount', '500'),
+      ('notify_on_signup', 'true'),
+      ('notify_on_payment', 'true'),
+      ('max_utr_attempts', '3');
+    `);
   }
 }
 

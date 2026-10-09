@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThuruvanPay Enterprise | Master Gateway Operations</title>
+  <title>ThuruvanPay Enterprise | Master Operations Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,6 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0b0f19; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 999px; }
@@ -46,7 +45,7 @@
     <!-- Navigation Menu -->
     <div class="p-4 flex-1 space-y-6 overflow-y-auto">
       
-      <!-- Section 1 -->
+      <!-- Group 1: Telemetry -->
       <div>
         <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Platform Analytics</p>
         <div class="space-y-1">
@@ -56,45 +55,63 @@
           </button>
           <button onclick="switchTab('transactions')" id="nav-transactions" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
             <i class="fa-solid fa-money-bill-transfer text-sm text-slate-500 group-hover:text-cyan-400"></i>
-            <span>Live Transactions</span>
+            <span>Transactions Ledger</span>
           </button>
         </div>
       </div>
 
-      <!-- Section 2 -->
+      <!-- Group 2: Merchants & Plans -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Merchant Ecosystem</p>
+        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Ecosystem & Revenue</p>
         <div class="space-y-1">
           <button onclick="switchTab('merchants')" id="nav-merchants" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
             <i class="fa-solid fa-store text-sm text-slate-500 group-hover:text-emerald-400"></i>
-            <span>All Merchant Hub</span>
+            <span>Merchant Hub</span>
+          </button>
+          <button onclick="switchTab('plans')" id="nav-plans" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i class="fa-solid fa-tags text-sm text-slate-500 group-hover:text-amber-400"></i>
+            <span>Subscription Plans</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Group 3: UPI Infrastructure -->
+      <div>
+        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Infrastructure & Security</p>
+        <div class="space-y-1">
+          <button onclick="switchTab('upipool')" id="nav-upipool" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i class="fa-solid fa-layer-group text-sm text-slate-500 group-hover:text-purple-400"></i>
+            <span>Multi-UPI VPA Pool</span>
+          </button>
+          <button onclick="switchTab('blacklist')" id="nav-blacklist" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i class="fa-solid fa-shield-virus text-sm text-slate-500 group-hover:text-rose-400"></i>
+            <span>Fraud & IP Blacklist</span>
           </button>
           <button onclick="switchTab('logs')" id="nav-logs" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-network-wired text-sm text-slate-500 group-hover:text-amber-400"></i>
+            <i class="fa-solid fa-network-wired text-sm text-slate-500 group-hover:text-blue-400"></i>
             <span>Webhook Dispatches</span>
           </button>
         </div>
       </div>
 
-      <!-- Section 3 -->
+      <!-- Group 4: Master Settings -->
       <div>
-        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Gateway Engine</p>
+        <p class="text-[10px] uppercase tracking-widest font-extrabold text-slate-500 px-3 mb-2.5">Master Controls</p>
         <div class="space-y-1">
-          <button onclick="switchTab('engine')" id="nav-engine" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-server text-sm text-slate-500 group-hover:text-purple-400"></i>
-            <span>UPI Routing & Config</span>
+          <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i class="fa-brands fa-telegram text-sm text-slate-500 group-hover:text-sky-400"></i>
+            <span>Alerts & Bot Config</span>
           </button>
-          <a href="/api-docs.html" target="_blank" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
-            <i class="fa-solid fa-code text-sm text-slate-500 group-hover:text-blue-400"></i>
-            <span>Developer Docs</span>
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-auto text-slate-600"></i>
-          </a>
+          <button onclick="switchTab('security')" id="nav-security" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group">
+            <i class="fa-solid fa-key text-sm text-slate-500 group-hover:text-amber-300"></i>
+            <span>Password & Security</span>
+          </button>
         </div>
       </div>
 
     </div>
 
-    <!-- Admin Status Footer -->
+    <!-- Admin Profile Footer -->
     <div class="p-4 border-t border-slate-800/70 bg-[#090d16]">
       <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
         <div class="flex items-center space-x-3 overflow-hidden">
@@ -120,41 +137,38 @@
     <!-- Top Bar -->
     <header class="h-18 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-30 px-6 sm:px-8 flex items-center justify-between gap-4">
       
-      <!-- Left: Mobile Menu Toggle & Title -->
+      <!-- Left Title -->
       <div class="flex items-center gap-4">
-        <button onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-white p-2 text-lg">
-          <i class="fa-solid fa-bars"></i>
-        </button>
         <div>
           <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
             <span id="page-title">Operations Console</span>
-            <span class="hidden sm:inline text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Cluster: Asia-South (IN)</span>
+            <span class="hidden sm:inline text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Live Gateway</span>
           </h2>
         </div>
       </div>
 
-      <!-- Right: Global Actions & Telemetry -->
+      <!-- Right Header Actions -->
       <div class="flex items-center gap-3">
-        <!-- Live Uptime Badge -->
-        <div class="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>Core Gateway: 100% Online</span>
-        </div>
+        <!-- Quick Export CSV Button -->
+        <button onclick="exportCsv()" class="hidden sm:flex px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition items-center gap-2 border border-slate-700">
+          <i class="fa-solid fa-file-excel text-emerald-400"></i>
+          <span>Export Excel/CSV</span>
+        </button>
 
         <!-- Quick Force Verify Button -->
         <button onclick="openForceVerifyModal()" class="px-4 py-2 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white text-xs font-extrabold rounded-xl shadow-lg shadow-indigo-950/60 transition flex items-center gap-2">
           <i class="fa-solid fa-bolt-lightning text-xs"></i>
-          <span>Force Settle Order</span>
+          <span>Force Settle</span>
         </button>
 
-        <button onclick="refreshCurrentTab()" class="p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-slate-300 transition text-xs" title="Refresh Live Feeds">
+        <button onclick="refreshCurrentTab()" class="p-2.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-slate-300 transition text-xs" title="Refresh">
           <i class="fa-solid fa-rotate-right"></i>
         </button>
       </div>
 
     </header>
 
-    <!-- Main Dynamic Body -->
+    <!-- Main Content Tabs -->
     <main class="flex-1 p-6 sm:p-8 space-y-8 max-w-7xl w-full mx-auto">
       
       <!-- ==================== TAB 1: OVERVIEW ==================== -->
@@ -162,8 +176,6 @@
         
         <!-- Big KPI Metric Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          
-          <!-- Card 1: Total Processed GMV -->
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 glow-indigo relative overflow-hidden group">
             <div class="flex items-center justify-between text-slate-400 mb-3">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Total Volume (GMV)</span>
@@ -173,14 +185,11 @@
             </div>
             <div class="text-3xl font-black text-white tracking-tight" id="kpi-revenue">₹0.00</div>
             <div class="mt-3 flex items-center gap-2 text-xs">
-              <span class="text-emerald-400 font-bold flex items-center gap-1">
-                <i class="fa-solid fa-arrow-trend-up"></i> 100%
-              </span>
+              <span class="text-emerald-400 font-bold"><i class="fa-solid fa-arrow-trend-up"></i> 100%</span>
               <span class="text-slate-500">Instant Direct Bank Settlement</span>
             </div>
           </div>
 
-          <!-- Card 2: Successful Transactions -->
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 glow-emerald relative overflow-hidden group">
             <div class="flex items-center justify-between text-slate-400 mb-3">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Settled Transactions</span>
@@ -195,7 +204,6 @@
             </div>
           </div>
 
-          <!-- Card 3: Active Merchants -->
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 relative overflow-hidden group">
             <div class="flex items-center justify-between text-slate-400 mb-3">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Merchant Network</span>
@@ -210,7 +218,6 @@
             </div>
           </div>
 
-          <!-- Card 4: Pending / Open Sessions -->
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 relative overflow-hidden group">
             <div class="flex items-center justify-between text-slate-400 mb-3">
               <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Pending QR Sessions</span>
@@ -224,18 +231,15 @@
               <span class="text-slate-500">Awaiting customer payment</span>
             </div>
           </div>
-
         </div>
 
-        <!-- Charts Section (Enterprise Graphs) -->
+        <!-- Charts -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <!-- Area Chart: Processing Trend -->
           <div class="lg:col-span-2 p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-extrabold text-white text-sm">Payment Processing Telemetry</h3>
-                <p class="text-xs text-slate-500">Live hourly transaction distribution across gateway cluster</p>
+                <p class="text-xs text-slate-500">Hourly volume aggregate curve</p>
               </div>
               <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">Live Graph</span>
             </div>
@@ -244,43 +248,34 @@
             </div>
           </div>
 
-          <!-- Donut Chart: UPI Apps Distribution -->
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4 flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between mb-1">
                 <h3 class="font-extrabold text-white text-sm">UPI App Distribution</h3>
                 <i class="fa-solid fa-mobile-screen-button text-indigo-400 text-xs"></i>
               </div>
-              <p class="text-xs text-slate-500">Payment source split across major providers</p>
+              <p class="text-xs text-slate-500">Payment source split</p>
             </div>
             <div class="h-48 w-full flex items-center justify-center">
               <canvas id="appSplitChart"></canvas>
             </div>
-            <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-slate-400 pt-2 border-t border-slate-800/80 font-semibold">
+            <div class="grid grid-cols-3 gap-2 text-center text-[10px] text-slate-400 pt-2 border-t border-slate-800 font-semibold">
               <div><span class="text-blue-400">● GPay:</span> 48%</div>
               <div><span class="text-purple-400">● PhonePe:</span> 34%</div>
               <div><span class="text-cyan-400">● Paytm:</span> 18%</div>
             </div>
           </div>
-
         </div>
 
-        <!-- Live Real-Time Transactions Feed -->
+        <!-- Recent Transactions -->
         <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-              <div>
-                <h3 class="font-extrabold text-white text-sm">Live Transaction Stream</h3>
-                <p class="text-xs text-slate-500">Latest orders submitted via developer API</p>
-              </div>
+              <h3 class="font-extrabold text-white text-sm">Live Transaction Stream</h3>
             </div>
-            <button onclick="switchTab('transactions')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1">
-              <span>View Full Ledger</span>
-              <i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </button>
+            <button onclick="switchTab('transactions')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300">View Full Ledger &rarr;</button>
           </div>
-
           <div class="overflow-x-auto rounded-2xl border border-slate-800/80">
             <table class="w-full text-left text-xs text-slate-300">
               <thead>
@@ -290,7 +285,7 @@
                   <th class="p-3.5">Amount</th>
                   <th class="p-3.5">Status</th>
                   <th class="p-3.5">UTR Reference</th>
-                  <th class="p-3.5">Dispatched At</th>
+                  <th class="p-3.5">Time</th>
                 </tr>
               </thead>
               <tbody id="overview-orders-tbody" class="divide-y divide-slate-800/60 font-medium">
@@ -302,42 +297,7 @@
 
       </div>
 
-      <!-- ==================== TAB 2: MERCHANTS HUB ==================== -->
-      <div id="tab-merchants" class="space-y-6 hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-black text-white">Merchant Ecosystem Control</h2>
-            <p class="text-xs text-slate-500">Audit merchant VPAs, track collected volume, and manage operational status</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <input type="text" id="merchant-search" placeholder="Search merchant name or email..." oninput="filterMerchantsList()" class="bg-[#0e1424] border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
-          </div>
-        </div>
-
-        <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800">
-          <div class="overflow-x-auto rounded-2xl border border-slate-800/80">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead>
-                <tr class="bg-slate-900/80 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-800 text-[10px]">
-                  <th class="p-4">UID</th>
-                  <th class="p-4">Merchant Entity</th>
-                  <th class="p-4">Email Contact</th>
-                  <th class="p-4">Linked UPI VPA</th>
-                  <th class="p-4">Total Volume</th>
-                  <th class="p-4">Txn Count</th>
-                  <th class="p-4">Status</th>
-                  <th class="p-4 text-right">Access Control</th>
-                </tr>
-              </thead>
-              <tbody id="merchants-tbody" class="divide-y divide-slate-800/60">
-                <tr><td colspan="8" class="p-8 text-center text-slate-500">Loading registered merchants...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== TAB 3: TRANSACTIONS LEDGER ==================== -->
+      <!-- ==================== TAB 2: TRANSACTIONS LEDGER ==================== -->
       <div id="tab-transactions" class="space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -345,7 +305,10 @@
             <p class="text-xs text-slate-500">Cryptographically verifiable transactions with NPCI bank UTR tracking</p>
           </div>
           <div class="flex items-center gap-3">
-            <input type="text" id="order-search-input" placeholder="Search Order ID / UTR / Customer..." oninput="debounceSearch()" class="bg-[#0e1424] border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-72">
+            <button onclick="exportCsv()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-download"></i> Download CSV
+            </button>
+            <input type="text" id="order-search-input" placeholder="Search Order ID / UTR / Customer..." oninput="debounceSearch()" class="bg-[#0e1424] border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
             <select id="order-status-filter" onchange="loadAdminOrders()" class="bg-[#0e1424] border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-bold">
               <option value="ALL">All Status</option>
               <option value="SUCCESS">Success Only</option>
@@ -366,7 +329,7 @@
                   <th class="p-4">Status</th>
                   <th class="p-4">UTR Reference</th>
                   <th class="p-4">Created Time</th>
-                  <th class="p-4 text-right">Force Settlement</th>
+                  <th class="p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody id="orders-tbody" class="divide-y divide-slate-800/60 font-medium">
@@ -377,7 +340,206 @@
         </div>
       </div>
 
-      <!-- ==================== TAB 4: WEBHOOK LOGS ==================== -->
+      <!-- ==================== TAB 3: MERCHANTS HUB ==================== -->
+      <div id="tab-merchants" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Merchant Ecosystem Control</h2>
+            <p class="text-xs text-slate-500">Audit merchant VPAs, track collected volume, and manage tier access</p>
+          </div>
+          <input type="text" id="merchant-search" placeholder="Search merchant..." oninput="filterMerchantsList()" class="bg-[#0e1424] border border-slate-800 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
+        </div>
+
+        <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800">
+          <div class="overflow-x-auto rounded-2xl border border-slate-800/80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead>
+                <tr class="bg-slate-900/80 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-800 text-[10px]">
+                  <th class="p-4">UID</th>
+                  <th class="p-4">Merchant Entity</th>
+                  <th class="p-4">Email</th>
+                  <th class="p-4">Linked UPI VPA</th>
+                  <th class="p-4">Total Volume</th>
+                  <th class="p-4">Plan Tier</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Access Control</th>
+                </tr>
+              </thead>
+              <tbody id="merchants-tbody" class="divide-y divide-slate-800/60 font-medium">
+                <tr><td colspan="8" class="p-8 text-center text-slate-500">Loading registered merchants...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 4: SUBSCRIPTION PLANS ==================== -->
+      <div id="tab-plans" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Subscription Plans & Pricing Tiers</h2>
+            <p class="text-xs text-slate-500">Configure pricing plans shown on homepage and merchant dashboards</p>
+          </div>
+          <button onclick="openNewPlanModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Add New Plan
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plans-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- ==================== TAB 5: MULTI-UPI POOL ==================== -->
+      <div id="tab-upipool" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Multi-UPI VPA Pool & Smart Routing</h2>
+            <p class="text-xs text-slate-500">Bank accounts cluster for high-volume QR load balancing and auto-failover</p>
+          </div>
+          <button onclick="openNewVpaModal()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Add UPI VPA to Pool
+          </button>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800">
+          <div class="overflow-x-auto rounded-2xl border border-slate-800/80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead>
+                <tr class="bg-slate-900/80 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-800 text-[10px]">
+                  <th class="p-4">ID</th>
+                  <th class="p-4">UPI VPA Address</th>
+                  <th class="p-4">Display / Merchant Name</th>
+                  <th class="p-4">Daily Limit (INR)</th>
+                  <th class="p-4">Today Volume</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="upipool-tbody" class="divide-y divide-slate-800/60 font-medium">
+                <tr><td colspan="7" class="p-8 text-center text-slate-500">Loading UPI pool...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 6: FRAUD & IP BLACKLIST ==================== -->
+      <div id="tab-blacklist" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white">Fraud Sentinel & Security Blacklist</h2>
+            <p class="text-xs text-slate-500">Instantly block malicious IP addresses submitting fake UTRs or flooding orders</p>
+          </div>
+          <button onclick="openAddBlacklistModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+            <i class="fa-solid fa-ban"></i> Block IP Address
+          </button>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800">
+          <div class="overflow-x-auto rounded-2xl border border-slate-800/80">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead>
+                <tr class="bg-slate-900/80 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-800 text-[10px]">
+                  <th class="p-4">ID</th>
+                  <th class="p-4">Blocked IP Address</th>
+                  <th class="p-4">Reason / Rule Trigger</th>
+                  <th class="p-4">Blocked Timestamp</th>
+                  <th class="p-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="blacklist-tbody" class="divide-y divide-slate-800/60 font-mono text-xs">
+                <tr><td colspan="5" class="p-8 text-center text-slate-500">No blocked IPs recorded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 7: TELEGRAM ALERTS & SETTINGS ==================== -->
+      <div id="tab-settings" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-black text-white">Telegram Alerts & Platform Configuration</h2>
+          <p class="text-xs text-slate-500">Instant push notifications sent to your personal Telegram for critical events</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
+            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
+              <i class="fa-brands fa-telegram text-sky-400 text-base"></i> Telegram Notification Bot
+            </h3>
+            <form onsubmit="saveSettingsForm(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">Telegram Bot Token (from @BotFather)</label>
+                <input type="text" id="setting-tg-token" placeholder="718291028:AAHxy..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white mono">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">Your Telegram Chat ID (from @userinfobot)</label>
+                <input type="text" id="setting-tg-chat" placeholder="182910284" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white mono">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">Minimum Alert Amount (INR ₹)</label>
+                <input type="number" id="setting-min-amount" value="500" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white font-bold">
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition">
+                  Save Bot Config
+                </button>
+                <button type="button" onclick="testTelegram()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold text-xs rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-paper-plane"></i> Test Alert
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
+            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-bell text-amber-400"></i> Event Triggers
+            </h3>
+            <div class="space-y-3 text-xs text-slate-400">
+              <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <span>New Merchant Signups</span>
+                <span class="text-emerald-400 font-bold">● Active</span>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <span>High Value Payments (&gt; Threshold)</span>
+                <span class="text-emerald-400 font-bold">● Active</span>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <span>Suspicious / Failed UTR Spikes</span>
+                <span class="text-emerald-400 font-bold">● Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 8: PASSWORD & SECURITY ==================== -->
+      <div id="tab-security" class="space-y-6 hidden">
+        <div>
+          <h2 class="text-xl font-black text-white">Master Credentials & Security</h2>
+          <p class="text-xs text-slate-500">Update master admin credentials and root password</p>
+        </div>
+
+        <div class="max-w-md p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
+          <form onsubmit="handleChangePassword(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">Current Master Password</label>
+              <input type="password" id="sec-current-pwd" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">New Secure Password</label>
+              <input type="password" id="sec-new-pwd" minlength="6" required placeholder="Minimum 6 characters" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white">
+            </div>
+            <button type="submit" id="btn-pwd-save" class="w-full py-3 bg-gradient-to-r from-rose-600 to-indigo-600 hover:opacity-95 text-white font-black text-xs rounded-xl shadow-lg transition">
+              Update Master Password
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 9: WEBHOOK LOGS ==================== -->
       <div id="tab-logs" class="space-y-6 hidden">
         <div>
           <h2 class="text-xl font-black text-white">Webhook Delivery Telemetry</h2>
@@ -390,10 +552,10 @@
               <thead>
                 <tr class="bg-slate-900/80 text-slate-400 uppercase font-extrabold tracking-wider border-b border-slate-800 text-[10px]">
                   <th class="p-4">Order ID</th>
-                  <th class="p-4">Merchant Webhook Endpoint</th>
-                  <th class="p-4">HTTP Response</th>
-                  <th class="p-4">Payload Trace</th>
-                  <th class="p-4">Dispatch Timestamp</th>
+                  <th class="p-4">Merchant Target URL</th>
+                  <th class="p-4">HTTP Status</th>
+                  <th class="p-4">Response Sample</th>
+                  <th class="p-4">Dispatched At</th>
                 </tr>
               </thead>
               <tbody id="logs-tbody" class="divide-y divide-slate-800/60 font-mono text-[11px]">
@@ -404,159 +566,149 @@
         </div>
       </div>
 
-      <!-- ==================== TAB 5: GATEWAY ENGINE CONFIG ==================== -->
-      <div id="tab-engine" class="space-y-6 hidden">
-        <div>
-          <h2 class="text-xl font-black text-white">UPI Gateway Engine Infrastructure</h2>
-          <p class="text-xs text-slate-500">Active server cluster, intent URI schemas, and automated notification routing</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
-            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
-              <i class="fa-solid fa-microchip text-indigo-400"></i> Core Gateway Engine Status
-            </h3>
-            <div class="space-y-3 text-xs">
-              <div class="flex justify-between py-2 border-b border-slate-800/80">
-                <span class="text-slate-400">Node.js Runtime</span>
-                <span class="text-white font-mono font-bold">v22.x LTS Native</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-slate-800/80">
-                <span class="text-slate-400">Process Manager</span>
-                <span class="text-emerald-400 font-bold font-mono">PM2 Daemon (Online)</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-slate-800/80">
-                <span class="text-slate-400">Reverse Proxy</span>
-                <span class="text-white font-mono font-bold">Nginx 1.24 + Cloudflare Edge</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-slate-800/80">
-                <span class="text-slate-400">Webhook Encryption</span>
-                <span class="text-white font-mono font-bold">HMAC-SHA256 Cryptographic Hash</span>
-              </div>
-              <div class="flex justify-between py-2">
-                <span class="text-slate-400">Average QR Generation Time</span>
-                <span class="text-emerald-400 font-mono font-bold">~14ms</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
-            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
-              <i class="fa-solid fa-mobile-screen text-emerald-400"></i> Android Auto-Verification Hook
-            </h3>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              When payments land in merchant bank accounts, credit SMS or app notifications are routed directly into:
-            </p>
-            <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-indigo-300 break-all">
-              POST https://thuruvanpay.in/api/webhook/notify
-            </div>
-            <p class="text-[11px] text-slate-500">
-              Protected by secret token header <code class="text-slate-300 font-mono">x-notify-secret</code>. Matching transactions are settled in &lt;1 second.
-            </p>
-          </div>
-        </div>
-      </div>
-
     </main>
-
   </div>
 
-  <!-- ==================== MODAL: FORCE VERIFY ORDER ==================== -->
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: Force Settle -->
   <div id="verify-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#0e1424] border border-slate-800 rounded-3xl max-w-md w-full p-7 shadow-2xl space-y-5 relative">
+    <div class="bg-[#0e1424] border border-slate-800 rounded-3xl max-w-md w-full p-7 shadow-2xl space-y-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-500 text-white flex items-center justify-center font-bold text-xs">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <h3 class="font-black text-white text-base">Force Settle Order</h3>
-        </div>
+        <h3 class="font-black text-white text-base">Force Settle Order</h3>
         <button onclick="closeForceVerifyModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
       </div>
-
-      <p class="text-xs text-slate-400 leading-relaxed">
-        This master admin override marks the order as <strong class="text-emerald-400">SUCCESS</strong>, credits the merchant balance, and triggers the cryptographic Webhook callback immediately.
-      </p>
-
-      <form onsubmit="handleForceVerify(event)" class="space-y-4">
+      <form onsubmit="handleForceVerify(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Order ID</label>
-          <input type="text" id="modal-order-id" required placeholder="ORD_1728..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs mono text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-bold text-slate-400 mb-1">Order ID</label>
+          <input type="text" id="modal-order-id" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs mono text-white">
         </div>
         <div>
-          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">12-Digit Bank UTR / Ref Number</label>
-          <input type="text" id="modal-utr" placeholder="Leave empty for auto ADMIN UTR" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs mono text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-bold text-slate-400 mb-1">12-Digit Bank UTR</label>
+          <input type="text" id="modal-utr" placeholder="Auto ADMIN UTR if empty" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs mono text-white">
         </div>
-
-        <button type="submit" id="btn-force-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-90 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-950/60 transition">
-          Confirm & Force Settle Order
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-emerald-500 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Confirm Settlement
         </button>
       </form>
     </div>
   </div>
 
-  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <!-- Modal 2: Add UPI VPA -->
+  <div id="vpa-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0e1424] border border-slate-800 rounded-3xl max-w-md w-full p-7 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-black text-white text-base">Add UPI VPA to Pool</h3>
+        <button onclick="closeNewVpaModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <form onsubmit="handleAddVpa(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">UPI VPA Address</label>
+          <input type="text" id="vpa-address" required placeholder="business@paytm / store@okaxis" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs mono text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Merchant Display Name</label>
+          <input type="text" id="vpa-name" required placeholder="Store Name" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Daily Cap / Limit (INR ₹)</label>
+          <input type="number" id="vpa-limit" value="100000" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white">
+        </div>
+        <button type="submit" class="w-full py-3 bg-purple-600 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Add VPA to Pool
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Block IP -->
+  <div id="ip-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0e1424] border border-slate-800 rounded-3xl max-w-md w-full p-7 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-black text-white text-base">Block IP Address</h3>
+        <button onclick="closeAddBlacklistModal()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <form onsubmit="handleAddBlacklist(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">IP Address</label>
+          <input type="text" id="block-ip" required placeholder="103.xxx.xxx.xxx" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs mono text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 mb-1">Reason</label>
+          <input type="text" id="block-reason" placeholder="Suspicious UTR brute force" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white">
+        </div>
+        <button type="submit" class="w-full py-3 bg-rose-600 text-white font-bold rounded-xl text-xs shadow-md transition">
+          Confirm Block
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
     const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) {
-      window.location.href = '/admin-login.html';
-    }
+    if (!adminToken) window.location.href = '/admin-login.html';
 
     const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
-    if (adminUser.email) {
-      document.getElementById('admin-user-display').textContent = adminUser.email;
-    }
+    if (adminUser.email) document.getElementById('admin-user-display').textContent = adminUser.email;
 
     let allMerchantsCache = [];
     let volumeChartInstance = null;
     let appSplitChartInstance = null;
 
-    // Switch Navigation Tabs
     function switchTab(tabId) {
-      const tabs = ['overview', 'merchants', 'transactions', 'logs', 'engine'];
+      const tabs = ['overview', 'transactions', 'merchants', 'plans', 'upipool', 'blacklist', 'settings', 'security', 'logs'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const nav = document.getElementById(`nav-${t}`);
-        if (nav) {
-          nav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group';
-        }
+        if (nav) nav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 transition group';
       });
 
       const target = document.getElementById(`tab-${tabId}`);
       if (target) target.classList.remove('hidden');
 
       const activeNav = document.getElementById(`nav-${tabId}`);
-      if (activeNav) {
-        activeNav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600/15 border border-indigo-500/30 text-indigo-300 transition group';
-      }
+      if (activeNav) activeNav.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600/15 border border-indigo-500/30 text-indigo-300 transition group';
 
       const titles = {
         overview: 'Operations Console',
-        merchants: 'Merchant Ecosystem Hub',
-        transactions: 'Live Transaction Ledger',
-        logs: 'Webhook Telemetry',
-        engine: 'Gateway Engine Routing'
+        transactions: 'Transactions Ledger',
+        merchants: 'Merchant Ecosystem',
+        plans: 'Subscription Plans',
+        upipool: 'Multi-UPI VPA Pool',
+        blacklist: 'Fraud & Security Sentinel',
+        settings: 'Telegram Alert Config',
+        security: 'Master Security & Password',
+        logs: 'Webhook Telemetry'
       };
       document.getElementById('page-title').textContent = titles[tabId] || 'Operations Console';
 
       if (tabId === 'overview') loadAdminStats();
-      if (tabId === 'merchants') loadAdminMerchants();
       if (tabId === 'transactions') loadAdminOrders();
+      if (tabId === 'merchants') loadAdminMerchants();
+      if (tabId === 'plans') loadPlans();
+      if (tabId === 'upipool') loadUpiPool();
+      if (tabId === 'blacklist') loadBlacklist();
+      if (tabId === 'settings') loadSettings();
       if (tabId === 'logs') loadWebhookLogs();
     }
 
     function refreshCurrentTab() {
-      const currentTab = ['overview', 'merchants', 'transactions', 'logs', 'engine'].find(t => !document.getElementById(`tab-${t}`).classList.contains('hidden')) || 'overview';
-      switchTab(currentTab);
+      const current = ['overview', 'transactions', 'merchants', 'plans', 'upipool', 'blacklist', 'settings', 'security', 'logs']
+        .find(t => !document.getElementById(`tab-${t}`).classList.contains('hidden')) || 'overview';
+      switchTab(current);
     }
 
-    // Load Overall KPIs
+    // Export CSV
+    function exportCsv() {
+      window.open('/admin-api/export-csv?token=' + adminToken, '_blank');
+    }
+
+    // Load Stats & Charts
     async function loadAdminStats() {
       try {
-        const res = await fetch('/admin-api/stats', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch('/admin-api/stats', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         if (res.status === 401 || res.status === 403) return logoutAdmin();
 
         const data = await res.json();
@@ -564,7 +716,7 @@
           const s = data.stats;
           document.getElementById('kpi-revenue').textContent = `₹${parseFloat(s.totalRevenue).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
           document.getElementById('kpi-merchants').textContent = s.totalMerchants;
-          document.getElementById('kpi-active-merchants').textContent = `${s.activeMerchants} Active Accounts`;
+          document.getElementById('kpi-active-merchants').textContent = `${s.activeMerchants} Active`;
           document.getElementById('kpi-success-orders').textContent = s.successOrders;
           document.getElementById('kpi-total-orders').textContent = `Total ${s.totalOrders} created`;
           document.getElementById('kpi-success-rate').textContent = `${s.successRate}% Success`;
@@ -573,65 +725,33 @@
           initCharts(s.totalRevenue, s.successOrders, s.pendingOrders);
         }
 
-        // Load preview transactions
-        const ordRes = await fetch('/admin-api/orders', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const ordRes = await fetch('/admin-api/orders', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const ordData = await ordRes.json();
-        if (ordData.status) {
-          renderOverviewOrders(ordData.orders.slice(0, 8));
-        }
-      } catch (err) {
-        console.error('Stats error:', err);
-      }
+        if (ordData.status) renderOverviewOrders(ordData.orders.slice(0, 8));
+      } catch (err) { console.error(err); }
     }
 
-    // Render Charts
-    function initCharts(revenue, successCount, pendingCount) {
-      // 1. Hourly/Volume Area Chart
+    function initCharts(revenue) {
       const ctxVol = document.getElementById('volumeChart');
       if (ctxVol) {
         if (volumeChartInstance) volumeChartInstance.destroy();
-        
-        const labels = ['10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', 'Now'];
-        const dataPoints = [
-          revenue * 0.1, 
-          revenue * 0.25, 
-          revenue * 0.4, 
-          revenue * 0.55, 
-          revenue * 0.75, 
-          revenue * 0.9, 
-          revenue
-        ];
-
         volumeChartInstance = new Chart(ctxVol, {
           type: 'line',
           data: {
-            labels: labels,
+            labels: ['10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', 'Now'],
             datasets: [{
-              label: 'Gross Volume (₹)',
-              data: dataPoints,
+              label: 'Volume (₹)',
+              data: [revenue * 0.1, revenue * 0.25, revenue * 0.4, revenue * 0.55, revenue * 0.75, revenue * 0.9, revenue],
               borderColor: '#6366f1',
               backgroundColor: 'rgba(99, 102, 241, 0.1)',
               fill: true,
-              tension: 0.4,
-              borderWidth: 2,
-              pointBackgroundColor: '#6366f1'
+              tension: 0.4
             }]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
-              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
-            }
-          }
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
       }
 
-      // 2. Donut App Split Chart
       const ctxApp = document.getElementById('appSplitChart');
       if (ctxApp) {
         if (appSplitChartInstance) appSplitChartInstance.destroy();
@@ -639,18 +759,9 @@
           type: 'doughnut',
           data: {
             labels: ['Google Pay', 'PhonePe', 'Paytm'],
-            datasets: [{
-              data: [48, 34, 18],
-              backgroundColor: ['#3b82f6', '#a855f7', '#06b6d4'],
-              borderWidth: 0
-            }]
+            datasets: [{ data: [48, 34, 18], backgroundColor: ['#3b82f6', '#a855f7', '#06b6d4'], borderWidth: 0 }]
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            cutout: '75%'
-          }
+          options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
         });
       }
     }
@@ -661,222 +772,278 @@
         tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No live transactions yet.</td></tr>`;
         return;
       }
-
-      tbody.innerHTML = orders.map(o => {
-        const isSuccess = o.status === 'SUCCESS';
-        const badge = isSuccess
-          ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 font-bold text-[10px]">SUCCESS</span>`
-          : `<span class="px-2.5 py-0.5 rounded-full bg-amber-950/80 text-amber-400 border border-amber-800/80 font-bold text-[10px]">PENDING</span>`;
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3.5 font-mono font-semibold text-white">${o.order_id}</td>
-            <td class="p-3.5">${o.merchant_name}</td>
-            <td class="p-3.5 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
-            <td class="p-3.5">${badge}</td>
-            <td class="p-3.5 mono text-slate-400 text-[11px]">${o.utr || '-'}</td>
-            <td class="p-3.5 text-slate-500">${new Date(o.created_at).toLocaleTimeString()}</td>
-          </tr>
-        `;
-      }).join('');
+      tbody.innerHTML = orders.map(o => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-3.5 font-mono text-white">${o.order_id}</td>
+          <td class="p-3.5">${o.merchant_name}</td>
+          <td class="p-3.5 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
+          <td class="p-3.5"><span class="px-2.5 py-0.5 rounded-full ${o.status === 'SUCCESS' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'} font-bold text-[10px]">${o.status}</span></td>
+          <td class="p-3.5 mono text-slate-400">${o.utr || '-'}</td>
+          <td class="p-3.5 text-slate-500">${new Date(o.created_at).toLocaleTimeString()}</td>
+        </tr>
+      `).join('');
     }
 
-    // Load Merchants List
+    // Merchants
     async function loadAdminMerchants() {
-      try {
-        const res = await fetch('/admin-api/merchants', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
-        const data = await res.json();
-        if (data.status) {
-          allMerchantsCache = data.merchants;
-          renderMerchantsTable(allMerchantsCache);
-        }
-      } catch (err) {
-        console.error(err);
-      }
+      const res = await fetch('/admin-api/merchants', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      if (data.status) { allMerchantsCache = data.merchants; renderMerchantsTable(allMerchantsCache); }
     }
 
     function filterMerchantsList() {
       const q = document.getElementById('merchant-search').value.toLowerCase();
-      const filtered = allMerchantsCache.filter(m => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q));
-      renderMerchantsTable(filtered);
+      renderMerchantsTable(allMerchantsCache.filter(m => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)));
     }
 
     function renderMerchantsTable(merchants) {
       const tbody = document.getElementById('merchants-tbody');
-      if (!merchants || merchants.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500">No merchants found.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = merchants.map(m => {
-        const isActive = m.is_active === 1;
-        const badge = isActive
-          ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px]">ACTIVE</span>`
-          : `<span class="px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-400 border border-rose-800 font-bold text-[10px]">SUSPENDED</span>`;
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition font-medium">
-            <td class="p-4 mono text-slate-500">#${m.id}</td>
-            <td class="p-4 font-bold text-white">${m.name}</td>
-            <td class="p-4 text-slate-400">${m.email}</td>
-            <td class="p-4 mono text-indigo-400">${m.upi_vpa || 'Not configured'}</td>
-            <td class="p-4 font-bold text-white">₹${parseFloat(m.total_volume).toFixed(2)}</td>
-            <td class="p-4 text-slate-400">${m.orders_count} orders</td>
-            <td class="p-4">${badge}</td>
-            <td class="p-4 text-right">
-              <button onclick="toggleMerchant(${m.id})" class="px-3 py-1 rounded-xl text-[11px] font-bold ${isActive ? 'bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800' : 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-800'} transition">
-                ${isActive ? 'Suspend' : 'Activate'}
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      tbody.innerHTML = merchants.map(m => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-4 mono text-slate-500">#${m.id}</td>
+          <td class="p-4 font-bold text-white">${m.name}</td>
+          <td class="p-4 text-slate-400">${m.email}</td>
+          <td class="p-4 mono text-indigo-400">${m.upi_vpa || 'Not configured'}</td>
+          <td class="p-4 font-bold text-white">₹${parseFloat(m.total_volume).toFixed(2)}</td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800 text-[10px] font-bold">${m.plan || 'PRO'}</span></td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded-full ${m.is_active === 1 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'} font-bold text-[10px]">${m.is_active === 1 ? 'ACTIVE' : 'SUSPENDED'}</span></td>
+          <td class="p-4 text-right">
+            <button onclick="toggleMerchant(${m.id})" class="px-3 py-1 rounded-xl text-[10px] font-bold ${m.is_active === 1 ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">
+              ${m.is_active === 1 ? 'Suspend' : 'Activate'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
     }
 
     async function toggleMerchant(id) {
-      if (!confirm('Are you sure you want to update this merchant status?')) return;
-      try {
-        const res = await fetch(`/admin-api/merchants/${id}/toggle`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
-        const d = await res.json();
-        alert(d.message);
-        loadAdminMerchants();
-      } catch (e) {
-        alert('Action failed');
-      }
+      if (!confirm('Update merchant access?')) return;
+      await fetch(`/admin-api/merchants/${id}/toggle`, { method: 'POST', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      loadAdminMerchants();
     }
 
+    // Orders Ledger
     let searchTimeout = null;
-    function debounceSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(loadAdminOrders, 300);
-    }
+    function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(loadAdminOrders, 300); }
 
-    // Load Transactions
     async function loadAdminOrders() {
-      const search = document.getElementById('order-search-input').value;
-      const status = document.getElementById('order-status-filter').value;
+      const s = document.getElementById('order-search-input').value;
+      const st = document.getElementById('order-status-filter').value;
+      const res = await fetch(`/admin-api/orders?search=${encodeURIComponent(s)}&status=${encodeURIComponent(st)}`, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      const tbody = document.getElementById('orders-tbody');
+      tbody.innerHTML = data.orders.map(o => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-4 mono text-white">${o.order_id}</td>
+          <td class="p-4 font-bold text-slate-200">${o.merchant_name}</td>
+          <td class="p-4 text-slate-400">${o.customer_name || 'N/A'}</td>
+          <td class="p-4 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded-full ${o.status === 'SUCCESS' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'} font-bold text-[10px]">${o.status}</span></td>
+          <td class="p-4 mono text-slate-400">${o.utr || '-'}</td>
+          <td class="p-4 text-slate-500">${new Date(o.created_at).toLocaleString()}</td>
+          <td class="p-4 text-right">${o.status !== 'SUCCESS' ? `<button onclick="openForceVerifyModal('${o.order_id}')" class="px-3 py-1 bg-gradient-to-r from-emerald-600 to-indigo-600 text-white rounded-xl text-[10px] font-bold">Force Settle</button>` : `<span class="text-emerald-400 text-[11px] font-bold">Settled</span>`}</td>
+        </tr>
+      `).join('');
+    }
 
-      try {
-        const res = await fetch(`/admin-api/orders?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`, {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
-        const data = await res.json();
-        const tbody = document.getElementById('orders-tbody');
-
-        if (data.status && data.orders.length > 0) {
-          tbody.innerHTML = data.orders.map(o => {
-            const isSuccess = o.status === 'SUCCESS';
-            const badge = isSuccess
-              ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold text-[10px]">SUCCESS</span>`
-              : `<span class="px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800 font-bold text-[10px]">PENDING</span>`;
-
-            return `
-              <tr class="hover:bg-slate-800/40 transition">
-                <td class="p-4 font-mono font-semibold text-white">${o.order_id}</td>
-                <td class="p-4 font-bold text-slate-200">${o.merchant_name}</td>
-                <td class="p-4 text-slate-400">${o.customer_name || 'N/A'}</td>
-                <td class="p-4 font-bold text-white">₹${parseFloat(o.amount).toFixed(2)}</td>
-                <td class="p-4">${badge}</td>
-                <td class="p-4 mono text-slate-400">${o.utr || '-'}</td>
-                <td class="p-4 text-slate-500">${new Date(o.created_at).toLocaleString()}</td>
-                <td class="p-4 text-right">
-                  ${!isSuccess ? `
-                    <button onclick="quickForceVerify('${o.order_id}')" class="px-3 py-1 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:opacity-90 text-white rounded-xl text-[10px] font-bold transition shadow-sm">
-                      Force Settle
-                    </button>
-                  ` : `
-                    <span class="text-emerald-500 font-bold text-[11px] flex items-center justify-end gap-1"><i class="fa-solid fa-check"></i> Settled</span>
-                  `}
-                </td>
-              </tr>
-            `;
-          }).join('');
-        } else {
-          tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500">No transactions matching filter.</td></tr>`;
-        }
-      } catch (err) {
-        console.error(err);
+    // Multi-UPI Pool
+    async function loadUpiPool() {
+      const res = await fetch('/admin-api/upi-pool', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      const tbody = document.getElementById('upipool-tbody');
+      if (data.status && data.pool.length > 0) {
+        tbody.innerHTML = data.pool.map(p => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-4 mono text-slate-500">#${p.id}</td>
+            <td class="p-4 mono text-indigo-400 font-bold">${p.vpa}</td>
+            <td class="p-4 text-white">${p.display_name}</td>
+            <td class="p-4 font-bold text-slate-200">₹${parseFloat(p.daily_limit).toFixed(2)}</td>
+            <td class="p-4 text-emerald-400 font-bold">₹${parseFloat(p.today_volume).toFixed(2)}</td>
+            <td class="p-4"><span class="px-2 py-0.5 rounded-full ${p.is_active === 1 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'} font-bold text-[10px]">${p.is_active === 1 ? 'ACTIVE' : 'INACTIVE'}</span></td>
+            <td class="p-4 text-right">
+              <button onclick="toggleVpa(${p.id})" class="px-2.5 py-1 text-[10px] bg-slate-800 rounded-lg text-slate-300 font-bold mr-1">Toggle</button>
+              <button onclick="deleteVpa(${p.id})" class="px-2.5 py-1 text-[10px] bg-rose-950 text-rose-300 rounded-lg font-bold">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500">No VPAs added to pool yet.</td></tr>`;
       }
     }
 
-    // Load Webhooks
+    function openNewVpaModal() { document.getElementById('vpa-modal').classList.remove('hidden'); }
+    function closeNewVpaModal() { document.getElementById('vpa-modal').classList.add('hidden'); }
+
+    async function handleAddVpa(e) {
+      e.preventDefault();
+      const vpa = document.getElementById('vpa-address').value;
+      const display_name = document.getElementById('vpa-name').value;
+      const daily_limit = document.getElementById('vpa-limit').value;
+      await fetch('/admin-api/upi-pool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ vpa, display_name, daily_limit })
+      });
+      closeNewVpaModal();
+      loadUpiPool();
+    }
+
+    async function toggleVpa(id) {
+      await fetch(`/admin-api/upi-pool/${id}/toggle`, { method: 'POST', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      loadUpiPool();
+    }
+
+    async function deleteVpa(id) {
+      if (!confirm('Remove this VPA?')) return;
+      await fetch(`/admin-api/upi-pool/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      loadUpiPool();
+    }
+
+    // Plans
+    async function loadPlans() {
+      const res = await fetch('/admin-api/plans', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      const c = document.getElementById('plans-container');
+      c.innerHTML = data.plans.map(p => `
+        <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-extrabold text-white text-base">${p.name}</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${p.validity_days} Days Validity</p>
+            </div>
+            <span class="text-2xl font-black text-indigo-400">₹${p.price}</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800 pt-3">${p.features}</p>
+        </div>
+      `).join('');
+    }
+
+    // Blacklist
+    async function loadBlacklist() {
+      const res = await fetch('/admin-api/blacklist', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      const tbody = document.getElementById('blacklist-tbody');
+      if (data.status && data.list.length > 0) {
+        tbody.innerHTML = data.list.map(b => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-4 text-slate-500">#${b.id}</td>
+            <td class="p-4 text-rose-400 font-bold">${b.ip_address}</td>
+            <td class="p-4 text-slate-300 font-sans">${b.reason}</td>
+            <td class="p-4 text-slate-500">${b.blocked_at}</td>
+            <td class="p-4 text-right"><button onclick="removeIp(${b.id})" class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold">Unblock</button></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">No IPs blocked. Gateway clear.</td></tr>`;
+      }
+    }
+
+    function openAddBlacklistModal() { document.getElementById('ip-modal').classList.remove('hidden'); }
+    function closeAddBlacklistModal() { document.getElementById('ip-modal').classList.add('hidden'); }
+
+    async function handleAddBlacklist(e) {
+      e.preventDefault();
+      const ip_address = document.getElementById('block-ip').value;
+      const reason = document.getElementById('block-reason').value;
+      await fetch('/admin-api/blacklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ ip_address, reason })
+      });
+      closeAddBlacklistModal();
+      loadBlacklist();
+    }
+
+    async function removeIp(id) {
+      await fetch(`/admin-api/blacklist/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      loadBlacklist();
+    }
+
+    // Settings & Telegram
+    async function loadSettings() {
+      const res = await fetch('/admin-api/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      if (data.status && data.settings) {
+        document.getElementById('setting-tg-token').value = data.settings.telegram_bot_token || '';
+        document.getElementById('setting-tg-chat').value = data.settings.telegram_chat_id || '';
+        document.getElementById('setting-min-amount').value = data.settings.alert_min_amount || '500';
+      }
+    }
+
+    async function saveSettingsForm(e) {
+      e.preventDefault();
+      const body = {
+        telegram_bot_token: document.getElementById('setting-tg-token').value,
+        telegram_chat_id: document.getElementById('setting-tg-chat').value,
+        alert_min_amount: document.getElementById('setting-min-amount').value
+      };
+      await fetch('/admin-api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify(body)
+      });
+      alert('Settings saved!');
+    }
+
+    async function testTelegram() {
+      const res = await fetch('/admin-api/test-telegram', { method: 'POST', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const d = await res.json();
+      alert(d.message);
+    }
+
+    // Change Password
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const current_password = document.getElementById('sec-current-pwd').value;
+      const new_password = document.getElementById('sec-new-pwd').value;
+      const res = await fetch('/admin-api/change-password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ current_password, new_password })
+      });
+      const d = await res.json();
+      alert(d.message);
+      if (d.status) {
+        document.getElementById('sec-current-pwd').value = '';
+        document.getElementById('sec-new-pwd').value = '';
+      }
+    }
+
+    // Webhook Logs
     async function loadWebhookLogs() {
-      try {
-        const res = await fetch('/admin-api/webhook-logs', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
-        const data = await res.json();
-        const tbody = document.getElementById('logs-tbody');
-
-        if (data.status && data.logs.length > 0) {
-          tbody.innerHTML = data.logs.map(l => `
-            <tr class="hover:bg-slate-800/40 transition">
-              <td class="p-4 font-mono font-semibold text-white">${l.order_id}</td>
-              <td class="p-4 font-mono text-slate-400 truncate max-w-xs">${l.url}</td>
-              <td class="p-4">
-                <span class="px-2.5 py-0.5 rounded-full ${l.response_status === 200 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'} font-bold text-[10px]">
-                  HTTP ${l.response_status}
-                </span>
-              </td>
-              <td class="p-4 font-mono text-slate-500 truncate max-w-xs">${l.response_body || '-'}</td>
-              <td class="p-4 text-slate-500 font-sans text-xs">${new Date(l.created_at).toLocaleString()}</td>
-            </tr>
-          `).join('');
-        } else {
-          tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">No webhook telemetry recorded yet.</td></tr>`;
-        }
-      } catch (err) {
-        console.error(err);
-      }
+      const res = await fetch('/admin-api/webhook-logs', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+      const data = await res.json();
+      const tbody = document.getElementById('logs-tbody');
+      tbody.innerHTML = data.logs.map(l => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-4 mono text-white">${l.order_id}</td>
+          <td class="p-4 mono text-slate-400 truncate max-w-xs">${l.url}</td>
+          <td class="p-4"><span class="px-2.5 py-0.5 rounded-full ${l.response_status === 200 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400'} font-bold text-[10px]">HTTP ${l.response_status}</span></td>
+          <td class="p-4 mono text-slate-500 truncate max-w-xs">${l.response_body || '-'}</td>
+          <td class="p-4 text-slate-500 font-sans text-xs">${new Date(l.created_at).toLocaleString()}</td>
+        </tr>
+      `).join('');
     }
 
-    function openForceVerifyModal(orderId = '') {
-      document.getElementById('modal-order-id').value = orderId;
+    function openForceVerifyModal(id = '') {
+      document.getElementById('modal-order-id').value = id;
       document.getElementById('verify-modal').classList.remove('hidden');
     }
-
-    function closeForceVerifyModal() {
-      document.getElementById('verify-modal').classList.add('hidden');
-    }
-
-    function quickForceVerify(orderId) {
-      openForceVerifyModal(orderId);
-    }
+    function closeForceVerifyModal() { document.getElementById('verify-modal').classList.add('hidden'); }
 
     async function handleForceVerify(e) {
       e.preventDefault();
       const orderId = document.getElementById('modal-order-id').value.trim();
       const utr = document.getElementById('modal-utr').value.trim();
-      const btn = document.getElementById('btn-force-submit');
-
-      btn.disabled = true;
-      btn.textContent = 'Processing Settlement...';
-
-      try {
-        const res = await fetch(`/admin-api/orders/${orderId}/verify`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${adminToken}`
-          },
-          body: JSON.stringify({ utr })
-        });
-        const d = await res.json();
-        alert(d.message);
-        closeForceVerifyModal();
-        loadAdminStats();
-        loadAdminOrders();
-      } catch (err) {
-        alert('Verification request failed.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Confirm & Force Settle Order';
-      }
+      const res = await fetch(`/admin-api/orders/${orderId}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ utr })
+      });
+      const d = await res.json();
+      alert(d.message);
+      closeForceVerifyModal();
+      refreshCurrentTab();
     }
 
     function logoutAdmin() {
