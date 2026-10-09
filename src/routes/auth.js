@@ -10,5 +10,7 @@ router.post('/regenerate-keys', authController.authMiddleware, authController.re
 router.post('/change-plan', authController.authMiddleware, authController.changeMerchantPlan);
 router.put('/profile', authController.authMiddleware, authController.updateProfile);
 router.post('/change-password', authController.authMiddleware, authController.changePassword);
+router.get('/subscription-config', authController.authMiddleware, authController.getSubscriptionConfig);
+router.post('/submit-subscription-payment', authController.authMiddleware, authController.submitSubscriptionPayment);
 
 module.exports = router;

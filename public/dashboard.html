@@ -905,8 +905,9 @@
             <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹299</p>
             <p class="text-[11px] text-slate-400">Up to 100,000 monthly transactions</p>
           </div>
-          <button onclick="upgradePlan('Starter')" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition">
-            Choose Starter
+          <button onclick="initiateSubscriptionPayment('Starter Gateway', 299, 30)" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-qrcode text-indigo-500"></i>
+            <span>Pay ₹299 & Activate</span>
           </button>
         </div>
 
@@ -921,8 +922,9 @@
             <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹799</p>
             <p class="text-[11px] text-slate-400">Up to 500,000 transactions + Priority UTR</p>
           </div>
-          <button onclick="upgradePlan('Pro')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition">
-            Activate Pro
+          <button onclick="initiateSubscriptionPayment('Pro Business Plan', 799, 90)" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>Pay ₹799 & Activate</span>
           </button>
         </div>
 
@@ -934,11 +936,101 @@
             <p class="text-2xl font-black font-mono text-slate-900 dark:text-white">₹1,999</p>
             <p class="text-[11px] text-slate-400">Unlimited transactions + Multi VPA pool</p>
           </div>
-          <button onclick="upgradePlan('Enterprise')" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition">
-            Choose Enterprise
+          <button onclick="initiateSubscriptionPayment('Enterprise Unlimited', 1999, 365)" class="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-qrcode text-indigo-500"></i>
+            <span>Pay ₹1,999 & Activate</span>
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: SUBSCRIPTION UPI QR PAYMENT ==================== -->
+  <div id="sub-payment-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-[#0f172a] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 max-h-[92vh] overflow-y-auto">
+      
+      <!-- Top Title & Dismiss -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-slate-900 dark:text-white text-base">Subscription UPI Payment</h3>
+            <p class="text-[11px] text-slate-400">Scan QR & Pay to activate membership</p>
+          </div>
+        </div>
+        <button onclick="closeSubPaymentModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white flex items-center justify-center text-lg">&times;</button>
+      </div>
+
+      <!-- Plan Price Summary Pill -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 to-emerald-50 dark:from-indigo-950/40 dark:to-emerald-950/40 border border-indigo-100 dark:border-indigo-800/60 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-black text-slate-900 dark:text-white" id="subpay-plan-name">Pro Business Plan</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono" id="subpay-validity-text">90 Days Validity • Direct Bank Credit</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xl font-black font-mono text-indigo-600 dark:text-emerald-400" id="subpay-amount-text">₹ 799.00</span>
+          <span class="block text-[9px] uppercase font-bold text-slate-400 font-mono">0% EXTRA FEE</span>
+        </div>
+      </div>
+
+      <!-- Laser Dynamic QR Box -->
+      <div class="p-5 rounded-2xl bg-white border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+        <div class="laser-line absolute left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 via-emerald-400 to-cyan-400 shadow-[0_0_12px_rgba(16,185,129,0.9)] z-20"></div>
+        <img id="subpay-qr-img" src="" alt="Subscription UPI QR Code" class="w-44 h-44 rounded-xl relative z-10 shadow-sm border border-slate-100">
+        <p class="text-[11px] font-extrabold text-slate-800 mt-2.5 font-mono text-center flex items-center gap-1.5">
+          <i class="fa-solid fa-qrcode text-indigo-600"></i> Scan with any UPI Application
+        </p>
+      </div>
+
+      <!-- Receiver UPI Address Bar -->
+      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+        <div>
+          <p class="text-[10px] font-extrabold text-slate-400 uppercase font-mono">Admin Receiver UPI VPA</p>
+          <p class="font-mono font-bold text-slate-800 dark:text-slate-200" id="subpay-receiver-vpa">thuruvanpay@okaxis</p>
+        </div>
+        <button type="button" onclick="copyReceiverUpi()" class="px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 rounded-lg text-xs font-bold transition flex items-center gap-1">
+          <i class="fa-regular fa-copy"></i>
+          <span>Copy</span>
+        </button>
+      </div>
+
+      <!-- 1-Click Mobile UPI Intent Buttons -->
+      <div class="space-y-1.5">
+        <p class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 font-mono">Instant 1-Click Pay (Mobile Apps)</p>
+        <div class="grid grid-cols-3 gap-2">
+          <a id="intent-gpay" href="#" class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-400 flex flex-col items-center justify-center text-center transition">
+            <i class="fa-brands fa-google text-blue-500 text-base mb-0.5"></i>
+            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">GPay</span>
+          </a>
+          <a id="intent-phonepe" href="#" class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-400 flex flex-col items-center justify-center text-center transition">
+            <i class="fa-solid fa-mobile-screen text-purple-500 text-base mb-0.5"></i>
+            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">PhonePe</span>
+          </a>
+          <a id="intent-paytm" href="#" class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-400 flex flex-col items-center justify-center text-center transition">
+            <i class="fa-solid fa-wallet text-cyan-500 text-base mb-0.5"></i>
+            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300">Paytm</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- UTR Verification Form -->
+      <form onsubmit="handleSubPaymentVerification(event)" class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Enter 12-Digit Bank UTR / Ref Number *
+          </label>
+          <input type="text" id="subpay-utr-input" required maxlength="18" placeholder="e.g. 428190284910" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-indigo-200 dark:border-indigo-900/60 rounded-xl px-4 py-2.5 text-sm font-mono font-black text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 tracking-wider">
+          <p class="text-[10px] text-slate-400 mt-1">Copy the 12-digit UTR from your GPay / PhonePe / Paytm receipt screen.</p>
+        </div>
+
+        <button type="submit" id="btn-subpay-submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-indigo-600 to-indigo-500 hover:opacity-95 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-950/40 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Verify & Activate Subscription Plan</span>
+        </button>
+      </form>
+
     </div>
   </div>
 
@@ -1461,26 +1553,109 @@
       document.getElementById('sub-modal').classList.add('hidden');
     }
 
-    async function upgradePlan(planName) {
+    // Subscription Payment & Dynamic QR Handlers
+    let currentPendingSub = {
+      planName: '',
+      amount: 0,
+      validity: 30,
+      receiverUpi: '',
+      receiverName: ''
+    };
+
+    async function initiateSubscriptionPayment(planName, amount, validityDays = 30) {
+      closeSubscriptionModal();
+      currentPendingSub.planName = planName;
+      currentPendingSub.amount = amount;
+      currentPendingSub.validity = validityDays;
+
+      document.getElementById('subpay-plan-name').textContent = planName;
+      document.getElementById('subpay-validity-text').textContent = `${validityDays} Days Validity • 0% Extra Commission`;
+      document.getElementById('subpay-amount-text').textContent = `₹ ${parseFloat(amount).toFixed(2)}`;
+      document.getElementById('subpay-utr-input').value = '';
+
       try {
-        const res = await fetch('/auth/change-plan', {
+        const res = await fetch('/auth/subscription-config', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        const receiverUpi = (data.status && data.receiver_upi) ? data.receiver_upi : 'thuruvanpay@okaxis';
+        const receiverName = (data.status && data.receiver_name) ? data.receiver_name : 'ThuruvanPay Official';
+        
+        currentPendingSub.receiverUpi = receiverUpi;
+        currentPendingSub.receiverName = receiverName;
+        
+        document.getElementById('subpay-receiver-vpa').textContent = receiverUpi;
+
+        // Clean plan token for transaction note
+        const note = `SUB_${planName.replace(/[^a-zA-Z0-9]/g, '_')}`;
+        const upiUri = `upi://pay?pa=${receiverUpi}&pn=${encodeURIComponent(receiverName)}&am=${parseFloat(amount).toFixed(2)}&cu=INR&tn=${note}`;
+
+        // Dynamic Laser QR Code
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+        document.getElementById('subpay-qr-img').src = qrUrl;
+
+        // Intent links for mobile apps
+        document.getElementById('intent-gpay').href = upiUri;
+        document.getElementById('intent-phonepe').href = upiUri;
+        document.getElementById('intent-paytm').href = upiUri;
+
+        document.getElementById('sub-payment-modal').classList.remove('hidden');
+      } catch (err) {
+        showToast('Failed to load gateway receiver settings', 'error');
+      }
+    }
+
+    function closeSubPaymentModal() {
+      document.getElementById('sub-payment-modal').classList.add('hidden');
+    }
+
+    function copyReceiverUpi() {
+      const vpa = document.getElementById('subpay-receiver-vpa').textContent;
+      navigator.clipboard.writeText(vpa);
+      showToast('Admin receiver UPI copied!');
+    }
+
+    async function handleSubPaymentVerification(e) {
+      e.preventDefault();
+      const utr = document.getElementById('subpay-utr-input').value.trim();
+      const btn = document.getElementById('btn-subpay-submit');
+
+      if (!utr || utr.length < 10) {
+        showToast('Please enter a valid 12-digit UTR reference number', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Verifying Bank Settlement...</span>`;
+
+      try {
+        const res = await fetch('/auth/submit-subscription-payment', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ plan: planName })
+          body: JSON.stringify({
+            plan_name: currentPendingSub.planName,
+            amount: currentPendingSub.amount,
+            utr: utr
+          })
         });
-        const d = await res.json();
-        if (d.status) {
-          showToast(d.message || `Upgraded to ${planName} Plan!`);
-          closeSubscriptionModal();
+
+        const data = await res.json();
+        if (data.status) {
+          showToast(data.message || 'Payment verified! Subscription activated!');
+          closeSubPaymentModal();
           loadDashboard();
         } else {
-          showToast(d.message || 'Upgrade failed', 'error');
+          showToast(data.message || 'Payment verification failed', 'error');
         }
-      } catch (e) {
-        showToast('Upgrade request failed', 'error');
+      } catch (err) {
+        showToast('Network error during verification', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Verify & Activate Subscription Plan</span>`;
       }
     }
 

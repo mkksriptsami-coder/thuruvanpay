@@ -793,6 +793,32 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Subscription Payment UPI Config -->
+          <div class="p-6 rounded-3xl bg-[#0e1424] border border-indigo-900/40 space-y-4 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+            <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-qrcode text-indigo-400 text-base"></i> Subscription Receiver UPI (QR Payments)
+            </h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Merchants paying to upgrade subscription plans (Starter, Pro, Enterprise) will scan dynamic QR codes directing payments to this UPI account.
+            </p>
+            <form onsubmit="saveSettingsForm(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">Admin Receiver UPI ID (VPA)</label>
+                <input type="text" id="setting-sub-upi" placeholder="thuruvanpay@okaxis" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white mono font-bold focus:border-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">Receiver Account / Business Name</label>
+                <input type="text" id="setting-sub-name" placeholder="ThuruvanPay Official" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white font-bold focus:border-indigo-500 outline-none">
+              </div>
+              <div class="pt-2">
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Subscription UPI Details
+                </button>
+              </div>
+            </form>
+          </div>
+
           <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
             <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
               <i class="fa-brands fa-telegram text-sky-400 text-base"></i> Telegram Notification Bot
@@ -822,11 +848,11 @@
             </form>
           </div>
 
-          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4">
+          <div class="p-6 rounded-3xl bg-[#0e1424] border border-slate-800 space-y-4 md:col-span-2">
             <h3 class="font-extrabold text-white text-sm flex items-center gap-2">
               <i class="fa-solid fa-bell text-amber-400"></i> Event Triggers
             </h3>
-            <div class="space-y-3 text-xs text-slate-400">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-400">
               <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                 <span>New Merchant Signups</span>
                 <span class="text-emerald-400 font-bold">● Active</span>
@@ -1671,6 +1697,8 @@
       const res = await fetch('/admin-api/settings', { headers: { 'Authorization': `Bearer ${adminToken}` } });
       const data = await res.json();
       if (data.status && data.settings) {
+        if (document.getElementById('setting-sub-upi')) document.getElementById('setting-sub-upi').value = data.settings.subscription_upi_vpa || '';
+        if (document.getElementById('setting-sub-name')) document.getElementById('setting-sub-name').value = data.settings.subscription_upi_name || '';
         document.getElementById('setting-tg-token').value = data.settings.telegram_bot_token || '';
         document.getElementById('setting-tg-chat').value = data.settings.telegram_chat_id || '';
         document.getElementById('setting-min-amount').value = data.settings.alert_min_amount || '500';
@@ -1680,6 +1708,8 @@
     async function saveSettingsForm(e) {
       e.preventDefault();
       const body = {
+        subscription_upi_vpa: document.getElementById('setting-sub-upi') ? document.getElementById('setting-sub-upi').value.trim() : undefined,
+        subscription_upi_name: document.getElementById('setting-sub-name') ? document.getElementById('setting-sub-name').value.trim() : undefined,
         telegram_bot_token: document.getElementById('setting-tg-token').value,
         telegram_chat_id: document.getElementById('setting-tg-chat').value,
         alert_min_amount: document.getElementById('setting-min-amount').value
@@ -1689,7 +1719,7 @@
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
         body: JSON.stringify(body)
       });
-      alert('Settings saved!');
+      alert('Settings saved successfully!');
     }
 
     async function testTelegram() {

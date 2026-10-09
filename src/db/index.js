@@ -115,9 +115,24 @@ function initDatabase() {
       FOREIGN KEY (merchant_id) REFERENCES merchants(id)
     );
 
+    CREATE TABLE IF NOT EXISTS subscription_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      merchant_id INTEGER NOT NULL,
+      plan_name TEXT NOT NULL,
+      amount REAL NOT NULL,
+      validity_days INTEGER NOT NULL,
+      receiver_upi TEXT NOT NULL,
+      utr TEXT NOT NULL,
+      status TEXT DEFAULT 'APPROVED',
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      approved_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_merchants_api_key ON merchants(api_key);
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
     CREATE INDEX IF NOT EXISTS idx_orders_merchant_id ON orders(merchant_id);
+    CREATE INDEX IF NOT EXISTS idx_sub_orders_utr ON subscription_orders(utr);
   `);
 
   // Seed default admin if not exists
@@ -153,6 +168,12 @@ function initDatabase() {
       ('max_utr_attempts', '3');
     `);
   }
+
+  db.exec(`
+    INSERT OR IGNORE INTO system_settings (key, value) VALUES
+    ('subscription_upi_vpa', 'thuruvanpay@okaxis'),
+    ('subscription_upi_name', 'ThuruvanPay Official');
+  `);
 }
 
 initDatabase();

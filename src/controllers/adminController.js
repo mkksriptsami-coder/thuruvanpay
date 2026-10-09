@@ -436,7 +436,9 @@ async function updateSettings(req, res) {
     const entries = Object.entries(req.body);
     const stmt = db.prepare('INSERT OR REPLACE INTO system_settings (key, value) VALUES (?, ?)');
     entries.forEach(([key, val]) => {
-      stmt.run(key, String(val));
+      if (val !== undefined && val !== null) {
+        stmt.run(key, String(val));
+      }
     });
     return res.status(200).json({ status: true, message: 'System settings saved!' });
   } catch (error) {
