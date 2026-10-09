@@ -3,65 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Super Admin Portal - Login</title>
+  <title>ThuruvanPay | Super Admin Clearance</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
+    .ambient-glow {
+      background: radial-gradient(circle at top, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at bottom, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-[#080c14] text-slate-100 min-h-screen flex items-center justify-center p-4 ambient-glow antialiased selection:bg-indigo-500 selection:text-white">
 
-  <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+  <!-- Main Card -->
+  <div class="w-full max-w-md bg-[#0e1424] border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
     
-    <!-- Top Accent Gradient -->
-    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-500 via-indigo-500 to-emerald-500"></div>
+    <!-- Top Glowing Gradient Bar -->
+    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400"></div>
 
     <!-- Header -->
     <div class="text-center mb-8">
-      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-indigo-600 text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-900/40">
-        <i class="fa-solid fa-shield-halved text-xl"></i>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-950/60 text-2xl font-black">
+        <i class="fa-solid fa-bolt-lightning"></i>
       </div>
-      <h1 class="text-2xl font-black tracking-tight text-white">Super Admin Control</h1>
-      <p class="text-xs text-slate-400 mt-1">Master Gateway Administration & Monitoring</p>
+      <h1 class="text-2xl font-black tracking-tight text-white">Thuruvan<span class="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">Pay</span></h1>
+      <div class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Master Admin Clearance
+      </div>
     </div>
 
     <!-- Alert Box -->
     <div id="alert-box" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold"></div>
 
-    <!-- Login Form -->
-    <form onsubmit="handleAdminLogin(event)" class="space-y-5">
+    <!-- Form -->
+    <form onsubmit="handleAdminLogin(event)" class="space-y-4">
       <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Admin Email</label>
+        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Master Identifier / Email</label>
         <div class="relative">
-          <i class="fa-solid fa-user-shield absolute left-4 top-3.5 text-slate-500 text-sm"></i>
-          <input type="email" id="admin-email" value="admin@thuruvanpay.in" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-800 transition">
+          <i class="fa-solid fa-shield-halved absolute left-4 top-3.5 text-slate-500 text-xs"></i>
+          <input type="email" id="admin-email" value="admin@thuruvanpay.in" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Master Password</label>
+        <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Root Security Key</label>
         <div class="relative">
-          <i class="fa-solid fa-key absolute left-4 top-3.5 text-slate-500 text-sm"></i>
-          <input type="password" id="admin-password" value="Admin@123" required class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-800 transition">
+          <i class="fa-solid fa-key absolute left-4 top-3.5 text-slate-500 text-xs"></i>
+          <input type="password" id="admin-password" value="Admin@123" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
         </div>
       </div>
 
-      <button type="submit" id="btn-admin-submit" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-900/30 transition">
-        Authenticate & Access Admin Panel
+      <button type="submit" id="btn-admin-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-emerald-500 hover:opacity-95 text-white font-black rounded-xl text-xs shadow-lg shadow-indigo-950/60 transition flex items-center justify-center gap-2">
+        <span>Verify & Enter Master Console</span>
+        <i class="fa-solid fa-arrow-right text-[11px]"></i>
       </button>
     </form>
 
-    <!-- Credential Hint -->
-    <div class="mt-6 p-3 bg-slate-800/50 rounded-xl border border-slate-800 text-[11px] text-slate-400 text-center">
-      Default Access: <span class="mono text-indigo-400">admin@thuruvanpay.in</span> / <span class="mono text-rose-400">Admin@123</span>
+    <!-- Credential Box -->
+    <div class="mt-6 p-3.5 bg-slate-900/80 rounded-2xl border border-slate-800/80 text-[11px] text-slate-400 text-center flex items-center justify-between px-4">
+      <span class="text-slate-500 font-mono text-[10px]">Access:</span>
+      <span class="mono text-indigo-400 font-bold">admin@thuruvanpay.in</span>
+      <span class="mono text-emerald-400 font-bold">Admin@123</span>
     </div>
 
     <div class="mt-6 text-center">
-      <a href="/login.html" class="text-xs text-slate-500 hover:text-slate-300 transition flex items-center justify-center gap-1">
-        <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Merchant Login
+      <a href="/login.html" class="text-xs text-slate-500 hover:text-slate-300 transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i> Merchant Portal Access
       </a>
     </div>
 
@@ -86,7 +97,7 @@
       const btn = document.getElementById('btn-admin-submit');
 
       btn.disabled = true;
-      btn.textContent = 'Verifying Credentials...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Verifying...';
 
       try {
         const res = await fetch('/admin-api/login', {
@@ -99,8 +110,8 @@
         if (data.status) {
           localStorage.setItem('adminToken', data.token);
           localStorage.setItem('adminUser', JSON.stringify(data.admin));
-          showAlert('Access Granted! Loading Admin Control...', true);
-          setTimeout(() => window.location.href = '/admin.html', 800);
+          showAlert('Clearance Verified! Entering Operations Center...', true);
+          setTimeout(() => window.location.href = '/admin.html', 700);
         } else {
           showAlert(data.message || 'Authentication failed');
         }
@@ -108,7 +119,7 @@
         showAlert('Server connection error');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Authenticate & Access Admin Panel';
+        btn.innerHTML = '<span>Verify & Enter Master Console</span> <i class="fa-solid fa-arrow-right text-[11px]"></i>';
       }
     }
   </script>
