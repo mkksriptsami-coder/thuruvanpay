@@ -41,3 +41,7 @@ Implemented on a branch dependent on PR #1:
 Validation: 23 tests pass. No production deployment, live transaction or historical ledger rewrite.
 
 **Next task:** select/integrate the authorized bank/payment provider and implement receipt matching plus atomic idempotent settlement before unpausing collections. Read PAYMENT_VERIFICATION_RUNBOOK.md. Remaining frontend security, callback safety, MFA/throttling and operational work remain open.
+
+## Paytm sandbox-only proof-of-concept (unmerged PR)
+
+A separate admin-only Paytm staging adapter, isolated test order table, staging JS checkout and signature/receipt tests are proposed. The live `/api/create-order` pause, wallet and subscription lockdown are unchanged. Staging provider transaction, provider activation, browser QA and production-ready settlement remain pending. See PAYTM_SANDBOX_RUNBOOK.md on the feature branch.

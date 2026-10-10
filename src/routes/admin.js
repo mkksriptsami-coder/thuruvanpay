@@ -55,4 +55,10 @@ router.post('/test-telegram', adminController.testTelegramAlert);
 router.get('/payouts', adminController.getPayouts);
 router.post('/payouts/:id/settle', adminController.settlePayout);
 
+
+// Isolated Paytm STAGING diagnostic routes; never touch live payment ledger.
+const paytmSandbox = require('../controllers/paytmSandboxController');
+router.post('/paytm-sandbox/initiate', paytmSandbox.guard, paytmSandbox.initiate);
+router.get('/paytm-sandbox/status/:orderId', paytmSandbox.guard, paytmSandbox.status);
+
 module.exports = router;
