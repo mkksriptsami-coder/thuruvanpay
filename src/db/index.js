@@ -135,13 +135,10 @@ function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_sub_orders_utr ON subscription_orders(utr);
   `);
 
-  // Seed default admin if not exists
-  const bcrypt = require('bcryptjs');
-  const adminCheck = db.prepare("SELECT id FROM admins WHERE email = 'admin@thuruvanpay.in'").get();
-  if (!adminCheck) {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync('Admin@123', salt);
-    db.prepare("INSERT INTO admins (email, password_hash, name) VALUES ('admin@thuruvanpay.in', ?, 'Master Administrator')").run(hash);
+  // Existing databases gain session revocation support; no admin is auto-created.
+  const adminColumns = db.prepare('PRAGMA table_info(admins)').all();
+  if (!adminColumns.some(column => column.name === 'auth_version')) {
+    db.exec('ALTER TABLE admins ADD COLUMN auth_version INTEGER NOT NULL DEFAULT 0');
   }
 
   // Seed default plans if not exists

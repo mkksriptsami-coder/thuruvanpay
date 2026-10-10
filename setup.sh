@@ -6,9 +6,9 @@ echo "🚀 Setting up ThuruvanPay Gateway on Lightsail..."
 echo "==============================================="
 
 # 1. Update system & install Node.js + PM2 if needed
-if ! command -v node &> /dev/null || [[ $(node -v | cut -d'.' -f1 | sed 's/v//') -lt 22 ]]; then
-    echo "📦 Installing Node.js 22 (required for built-in SQLite)..."
-    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+if ! command -v node &> /dev/null || [[ $(node -v | cut -d'.' -f1 | sed 's/v//') -lt 24 ]]; then
+    echo "📦 Installing Node.js 24 (required for built-in SQLite)..."
+    curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
     sudo apt-get install -y nodejs nginx git
 fi
 
@@ -19,7 +19,8 @@ fi
 
 # 2. Install project dependencies
 echo "📦 Installing application dependencies..."
-npm install --production
+npm ci --omit=dev
+node -e "require('dotenv').config(); require('./src/security/config').validateRuntimeSecrets();"
 
 # 3. Start or Restart with PM2
 echo "⚡ Starting ThuruvanPay server with PM2..."

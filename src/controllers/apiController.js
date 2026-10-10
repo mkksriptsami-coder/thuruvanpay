@@ -1,6 +1,7 @@
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 const db = require('../db');
+const { getSecret } = require('../security/config');
 const { sendWebhook } = require('../utils/webhookDispatcher');
 
 // 1. Create Order (Merchant developer API)
@@ -284,7 +285,8 @@ async function submitManualUtr(req, res) {
 async function receiveNotificationWebhook(req, res) {
   try {
     const notificationSecret = req.headers['x-notify-secret'] || req.body.secret_key;
-    const expectedSecret = process.env.NOTIFICATION_SECRET_KEY || 'notify_secret_gateway_2026';
+    const expectedSecret = getSecret('NOTIFICATION_SECRET_KEY', { optional: true });
+    if (!expectedSecret) return res.status(503).json({ status: false, message: 'Notification receiver is not configured.' });
 
     if (notificationSecret !== expectedSecret) {
       return res.status(403).json({ status: false, message: 'Unauthorized notification request.' });

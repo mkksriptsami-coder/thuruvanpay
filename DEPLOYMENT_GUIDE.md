@@ -1,3 +1,5 @@
+> Deployment prerequisite: follow ADMIN_SECURITY_RUNBOOK.md. The embedded installer is retired.
+
 # ☁️ AWS VPS Deployment & Android Auto-Verification Guide
 
 இந்த வழிகாட்டி மூலம் உங்கள் AWS VPS (Ubuntu) சர்வரில் இந்த UPI Payment Gateway தளத்தை 10 நிமிடங்களில் முழுமையாக லைவ் செய்யலாம்.
