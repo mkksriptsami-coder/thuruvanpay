@@ -45,7 +45,7 @@
         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Master Identifier / Email</label>
         <div class="relative">
           <i class="fa-solid fa-shield-halved absolute left-4 top-3.5 text-slate-500 text-xs"></i>
-          <input type="email" id="admin-email" value="admin@thuruvanpay.in" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
+          <input type="email" id="admin-email" autocomplete="username" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
         </div>
       </div>
 
@@ -53,7 +53,7 @@
         <label class="block text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">Root Security Key</label>
         <div class="relative">
           <i class="fa-solid fa-key absolute left-4 top-3.5 text-slate-500 text-xs"></i>
-          <input type="password" id="admin-password" value="Admin@123" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
+          <input type="password" id="admin-password" autocomplete="current-password" required class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 focus:bg-slate-900 transition font-medium">
         </div>
       </div>
 
@@ -63,12 +63,7 @@
       </button>
     </form>
 
-    <!-- Credential Box -->
-    <div class="mt-6 p-3.5 bg-slate-900/80 rounded-2xl border border-slate-800/80 text-[11px] text-slate-400 text-center flex items-center justify-between px-4">
-      <span class="text-slate-500 font-mono text-[10px]">Access:</span>
-      <span class="mono text-indigo-400 font-bold">admin@thuruvanpay.in</span>
-      <span class="mono text-emerald-400 font-bold">Admin@123</span>
-    </div>
+    <p class="mt-6 text-center text-xs text-slate-400">Authorized administrators only. Contact your system operator for access.</p>
 
     <div class="mt-6 text-center">
       <a href="/login.html" class="text-xs text-slate-500 hover:text-slate-300 transition flex items-center justify-center gap-1.5">

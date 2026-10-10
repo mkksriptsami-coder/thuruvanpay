@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
+const { getJwtSecret } = require('../security/config');
 
 function generateApiKey() {
   return 'key_' + crypto.randomBytes(16).toString('hex');
@@ -50,7 +51,7 @@ async function register(req, res) {
 
     const token = jwt.sign(
       { id: result.lastInsertRowid, email: cleanEmail },
-      process.env.JWT_SECRET || 'secret',
+      getJwtSecret(),
       { expiresIn: '7d' }
     );
 
@@ -94,7 +95,7 @@ async function login(req, res) {
 
     const token = jwt.sign(
       { id: merchant.id, email: merchant.email },
-      process.env.JWT_SECRET || 'secret',
+      getJwtSecret(),
       { expiresIn: '7d' }
     );
 
@@ -125,7 +126,12 @@ function authMiddleware(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    const decoded = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
+    if (decoded.isAdmin || !Number.isSafeInteger(decoded.id)) {
+      return res.status(403).json({ status: false, message: 'Merchant session required.' });
+    }
+    const merchant = db.prepare('SELECT id FROM merchants WHERE id = ? AND is_active = 1').get(decoded.id);
+    if (!merchant) return res.status(403).json({ status: false, message: 'Merchant account unavailable.' });
     req.user = decoded;
     next();
   } catch (err) {

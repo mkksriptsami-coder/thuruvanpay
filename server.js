@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./src/security/config').validateRuntimeSecrets();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

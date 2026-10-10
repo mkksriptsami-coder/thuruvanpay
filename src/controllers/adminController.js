@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
+const { getJwtSecret, isExposedAdminPassword, validAdminPassword } = require('../security/config');
 const { sendWebhook } = require('../utils/webhookDispatcher');
 
 // Admin Auth Middleware
@@ -13,9 +14,13 @@ function adminMiddleware(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    if (!decoded.isAdmin) {
+    const decoded = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
+    if (decoded.isAdmin !== true || !Number.isSafeInteger(decoded.id) || !Number.isSafeInteger(decoded.authVersion)) {
       return res.status(403).json({ status: false, message: 'Forbidden. Admin privileges required.' });
+    }
+    const current = db.prepare('SELECT id, auth_version FROM admins WHERE id = ?').get(decoded.id);
+    if (!current || current.auth_version !== decoded.authVersion) {
+      return res.status(403).json({ status: false, message: 'Invalid or expired admin session.' });
     }
     req.admin = decoded;
     next();
@@ -28,8 +33,12 @@ function adminMiddleware(req, res, next) {
 async function login(req, res) {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
       return res.status(400).json({ status: false, message: 'Email and password required.' });
+    }
+
+    if (isExposedAdminPassword(password)) {
+      return res.status(401).json({ status: false, message: 'Invalid admin credentials.' });
     }
 
     const cleanEmail = email.trim().toLowerCase();
@@ -45,9 +54,9 @@ async function login(req, res) {
     }
 
     const token = jwt.sign(
-      { id: admin.id, email: admin.email, isAdmin: true },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '24h' }
+      { id: admin.id, email: admin.email, isAdmin: true, authVersion: admin.auth_version },
+      getJwtSecret(),
+      { expiresIn: '8h', algorithm: 'HS256' }
     );
 
     return res.status(200).json({
@@ -230,6 +239,10 @@ async function changePassword(req, res) {
       return res.status(400).json({ status: false, message: 'Current and new password are required.' });
     }
 
+    if (typeof current_password !== 'string' || !validAdminPassword(new_password)) {
+      return res.status(400).json({ status: false, message: 'Use a new admin password of at least 14 characters and at most 72 UTF-8 bytes.' });
+    }
+
     const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(req.admin.id);
     if (!admin) return res.status(404).json({ status: false, message: 'Admin not found.' });
 
@@ -240,9 +253,9 @@ async function changePassword(req, res) {
 
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(new_password, salt);
-    db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(hash, req.admin.id);
+    db.prepare('UPDATE admins SET password_hash = ?, auth_version = auth_version + 1 WHERE id = ?').run(hash, req.admin.id);
 
-    return res.status(200).json({ status: true, message: 'Admin password changed successfully!' });
+    return res.status(200).json({ status: true, message: 'Admin password changed. All admin sessions revoked; sign in again.' });
   } catch (error) {
     return res.status(500).json({ status: false, message: 'Error changing password.' });
   }
