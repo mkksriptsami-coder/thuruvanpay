@@ -27,20 +27,20 @@ test('amount is integer paise; rejects floating point, zeros, overlimit', () => 
 test('signed staging request verifies Paytm signature and uses POST with HTTPS', async () => {
   const response = { resultInfo: { resultStatus: 'PENDING' }, orderId: 'SBX_123' };
   const spy = async (url, options) => {
-    assert.equal(url, 'https://securegw-stage.paytmpayments.in/v3/order/status');
+    assert.equal(url, 'https://securestage.paytmpayments.com/v3/order/status');
     assert.equal(options.method, 'POST');
     const sent = JSON.parse(options.body);
     assert.equal(paytm.verify(JSON.stringify(sent.body), key, sent.head.signature), true);
     return paytmResponse(response);
   };
-  const r = await paytm.signedRequest('https://securegw-stage.paytmpayments.in/v3/order/status', { mid: cfg.mid, orderId: 'SBX_123' }, cfg, spy);
+  const r = await paytm.signedRequest('https://securestage.paytmpayments.com/v3/order/status', { mid: cfg.mid, orderId: 'SBX_123' }, cfg, spy);
   assert.equal(r.orderId, 'SBX_123');
 });
 test('unsigned and tampered staging responses are denied', async () => {
   const bogus = { resultInfo: { resultStatus: 'TXN_SUCCESS' }, txnAmount: '1.00' };
-  await assert.rejects(paytm.signedRequest('https://securegw-stage.paytmpayments.in/v3/order/status', {}, cfg, async () => ({ok:true,json:async()=>({body:bogus,head:{signature:'bad'}})})), /signature/);
+  await assert.rejects(paytm.signedRequest('https://securestage.paytmpayments.com/v3/order/status', {}, cfg, async () => ({ok:true,json:async()=>({body:bogus,head:{signature:'bad'}})})), /signature/);
   const signed = paytmResponse(bogus); const obj = await signed.json(); obj.body.txnAmount = '9.00';
-  await assert.rejects(paytm.signedRequest('https://securegw-stage.paytmpayments.in/v3/order/status', {}, cfg, async () => ({ok:true,json:async()=>obj})), /signature/);
+  await assert.rejects(paytm.signedRequest('https://securestage.paytmpayments.com/v3/order/status', {}, cfg, async () => ({ok:true,json:async()=>obj})), /signature/);
 });
 test('declined staging requests never produce valid token', async () => {
   const declined = { resultInfo: { resultStatus:'F',resultCode:'2005' } };
