@@ -18,6 +18,7 @@ router.put('/merchants/:id/plan', adminController.updateMerchantPlan);
 
 // 3. Transactions & CSV Export
 router.get('/orders', adminController.getOrders);
+router.get('/payment-reviews', adminController.getPaymentReviews);
 router.post('/orders/:orderId/verify', adminController.manualVerifyOrder);
 router.get('/export-csv', adminController.exportTransactionsCsv);
 
