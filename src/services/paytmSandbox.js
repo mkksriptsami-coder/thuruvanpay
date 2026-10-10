@@ -3,8 +3,8 @@
 const crypto = require('node:crypto');
 const IV = Buffer.from('@@@@&&&&####$$$$', 'utf8');
 const INIT_HOST = 'https://securestage.paytmpayments.com';
-const STATUS_ENDPOINT = 'https://securegw-stage.paytmpayments.in/v3/order/status';
-const CHECKOUT_HOST = 'https://securegw-stage.paytm.in';
+const STATUS_ENDPOINT = 'https://securestage.paytmpayments.com/v3/order/status';
+const CHECKOUT_HOST = 'https://securestage.paytmpayments.com';
 
 function configuration(env = process.env) {
   if (env.PAYTM_SANDBOX_ENABLED !== 'true') return null;
