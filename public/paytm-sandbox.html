@@ -19,7 +19,7 @@ document.getElementById('start').onclick=async()=>{
     result.textContent='Order ID: '+active.order_id+' | Amount: '+active.amount+' INR';
     document.getElementById('status').disabled=false;
     const url=new URL(active.checkout_script);
-    if(url.origin!=='https://securegw-stage.paytm.in'||!/^\/merchantpgpui\/checkoutjs\/merchants\/[A-Za-z0-9_-]{6,64}\.js$/.test(url.pathname))throw new Error('Invalid sandbox checkout script URL');
+    if(url.origin!=='https://securestage.paytmpayments.com'||!/^\/merchantpgpui\/checkoutjs\/merchants\/[A-Za-z0-9_-]{6,64}\.js$/.test(url.pathname))throw new Error('Invalid sandbox checkout script URL');
     const s=document.createElement('script');s.src=url.href;s.crossOrigin='anonymous';
     s.onload=()=>{
       if(!window.Paytm?.CheckoutJS) {message.textContent='Staging checkout unavailable';return}
