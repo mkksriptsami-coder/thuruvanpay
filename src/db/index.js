@@ -129,6 +129,21 @@ function initDatabase() {
       FOREIGN KEY (merchant_id) REFERENCES merchants(id)
     );
 
+    CREATE TABLE IF NOT EXISTS payment_review_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL CHECK (kind IN ('ORDER', 'SUBSCRIPTION')),
+      target_id TEXT NOT NULL,
+      merchant_id INTEGER NOT NULL,
+      utr TEXT NOT NULL,
+      amount_paise INTEGER NOT NULL CHECK (amount_paise > 0),
+      plan_name TEXT,
+      receiver_upi TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING_VERIFICATION' CHECK (status = 'PENDING_VERIFICATION'),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(kind, target_id, merchant_id, utr),
+      FOREIGN KEY (merchant_id) REFERENCES merchants(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_merchants_api_key ON merchants(api_key);
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
     CREATE INDEX IF NOT EXISTS idx_orders_merchant_id ON orders(merchant_id);
