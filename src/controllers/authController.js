@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const { getJwtSecret } = require('../security/config');
+const { submitSubscriptionReview, respondToReview } = require('../services/paymentReview');
 
 function generateApiKey() {
   return 'key_' + crypto.randomBytes(16).toString('hex');
@@ -265,15 +266,7 @@ async function regenerateKeys(req, res) {
 
 // Upgrade / Change Plan for Merchant
 async function changeMerchantPlan(req, res) {
-  try {
-    const { plan } = req.body;
-    if (!plan) return res.status(400).json({ status: false, message: 'Plan is required.' });
-
-    db.prepare('UPDATE merchants SET plan = ? WHERE id = ?').run(plan, req.user.id);
-    return res.status(200).json({ status: true, message: `Successfully upgraded to ${plan} Plan!` });
-  } catch (error) {
-    return res.status(500).json({ status: false, message: 'Failed to update subscription.' });
-  }
+  return res.status(403).json({ status: false, message: 'Self-service plan activation is disabled. A payment reference cannot activate a plan.' });
 }
 
 // Update Merchant Profile
@@ -350,8 +343,9 @@ async function getSubscriptionConfig(req, res) {
 
     return res.status(200).json({
       status: true,
-      receiver_upi: receiverUpi,
-      receiver_name: receiverName,
+      verification_available: false,
+      receiver_upi: null,
+      receiver_name: null,
       plans
     });
   } catch (error) {
@@ -361,49 +355,7 @@ async function getSubscriptionConfig(req, res) {
 
 // Submit Subscription Payment with UTR
 async function submitSubscriptionPayment(req, res) {
-  try {
-    const { plan_name, amount, utr } = req.body;
-
-    if (!plan_name || !amount || !utr) {
-      return res.status(400).json({ status: false, message: 'Plan name, amount, and 12-digit UTR are required.' });
-    }
-
-    const cleanUtr = String(utr).trim();
-    if (cleanUtr.length < 10 || cleanUtr.length > 20) {
-      return res.status(400).json({ status: false, message: 'Please enter a valid 12-digit Bank UTR reference number.' });
-    }
-
-    // Check duplicate UTR
-    const dupCheck = db.prepare("SELECT id FROM subscription_orders WHERE utr = ?").get(cleanUtr);
-    if (dupCheck) {
-      return res.status(409).json({ status: false, message: 'This UTR has already been submitted and processed.' });
-    }
-
-    // Lookup plan validity
-    const planRow = db.prepare("SELECT validity_days FROM subscription_plans WHERE name LIKE ?").get(`%${plan_name}%`);
-    const validity = planRow ? planRow.validity_days : 30;
-
-    const upiRow = db.prepare("SELECT value FROM system_settings WHERE key = 'subscription_upi_vpa'").get();
-    const receiverUpi = upiRow && upiRow.value ? upiRow.value : 'thuruvanpay@okaxis';
-
-    // Insert subscription payment record
-    db.prepare(`
-      INSERT INTO subscription_orders (merchant_id, plan_name, amount, validity_days, receiver_upi, utr, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'APPROVED')
-    `).run(req.user.id, plan_name, parseFloat(amount), validity, receiverUpi, cleanUtr);
-
-    // Update merchant's plan immediately
-    db.prepare("UPDATE merchants SET plan = ? WHERE id = ?").run(plan_name, req.user.id);
-
-    return res.status(200).json({
-      status: true,
-      message: `Payment verified! Congratulations, your ${plan_name} is now ACTIVE!`,
-      plan: plan_name
-    });
-  } catch (error) {
-    console.error('[Subscription Payment Error]:', error);
-    return res.status(500).json({ status: false, message: 'Failed to process subscription payment.' });
-  }
+  return respondToReview(res, () => submitSubscriptionReview(req.user.id, req.body));
 }
 
 module.exports = {

@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const { getJwtSecret, isExposedAdminPassword, validAdminPassword } = require('../security/config');
-const { sendWebhook } = require('../utils/webhookDispatcher');
+const { verificationUnavailable } = require('../services/paymentReview');
 
 // Admin Auth Middleware
 function adminMiddleware(req, res, next) {
@@ -187,38 +187,13 @@ async function getOrders(req, res) {
 
 // 6. Manual Force Verify Order by Admin
 async function manualVerifyOrder(req, res) {
-  try {
-    const { orderId } = req.params;
-    const { utr } = req.body;
+  // Admin privilege is not evidence that funds arrived; no force-credit escape hatch.
+  return verificationUnavailable(res);
+}
 
-    const order = db.prepare('SELECT * FROM orders WHERE order_id = ?').get(orderId);
-    if (!order) {
-      return res.status(404).json({ status: false, message: 'Order not found.' });
-    }
-
-    const finalUtr = (utr && utr.trim()) || `ADMIN_VERIFIED_${Date.now()}`;
-    const now = new Date().toISOString();
-
-    db.prepare(`
-      UPDATE orders 
-      SET status = 'SUCCESS', utr = ?, payment_app = 'Admin Manual Verification', completed_at = ?
-      WHERE order_id = ?
-    `).run(finalUtr, now, orderId);
-
-    // Credit merchant balance
-    db.prepare('UPDATE merchants SET balance = balance + ? WHERE id = ?').run(order.amount, order.merchant_id);
-
-    // Send webhook to merchant
-    sendWebhook(orderId);
-
-    return res.status(200).json({
-      status: true,
-      message: `Order ${orderId} marked as SUCCESS! Webhook dispatched.`,
-      utr: finalUtr
-    });
-  } catch (error) {
-    return res.status(500).json({ status: false, message: 'Failed to verify order.' });
-  }
+async function getPaymentReviews(req, res) {
+  const reviews = db.prepare('SELECT * FROM payment_review_requests ORDER BY id DESC LIMIT 100').all();
+  return res.status(200).json({ status: true, reviews });
 }
 
 // 7. Get Recent Webhook Logs
@@ -521,6 +496,7 @@ module.exports = {
   toggleMerchantStatus,
   getOrders,
   manualVerifyOrder,
+  getPaymentReviews,
   getWebhookLogs,
   changePassword,
   updateProfile,

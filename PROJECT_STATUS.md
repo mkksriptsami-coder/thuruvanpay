@@ -26,3 +26,18 @@ Read ADMIN_SECURITY_RUNBOOK.md before deploying. Fresh runtime secrets and a pro
 5. Admin MFA, throttling, security headers, durable webhook retries and operational recovery tests.
 
 Detailed audit evidence is provided separately to the owner. Payment issues remain open in this focused patch.
+
+## Next patch: payment-verification containment
+
+Implemented on a branch dependent on PR #1:
+
+- Unverified order/subscription references produce pending review records only.
+- New collection, notification auto-credit and admin force-credit are paused until a real verifier is integrated.
+- Direct merchant plan activation is forbidden; subscription amount/name comes from server configuration.
+- Identical retries are idempotent and never change financial state; review submission is transactional.
+- Cached-client-safe pending responses, paused checkout/subscription UI and protected admin review queue.
+- Preserves historical records for reconciliation; does not assert historical SUCCESS means bank-verified.
+
+Validation: 23 tests pass. No production deployment, live transaction or historical ledger rewrite.
+
+**Next task:** select/integrate the authorized bank/payment provider and implement receipt matching plus atomic idempotent settlement before unpausing collections. Read PAYMENT_VERIFICATION_RUNBOOK.md. Remaining frontend security, callback safety, MFA/throttling and operational work remain open.
