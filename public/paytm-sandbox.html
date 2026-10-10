@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ThuruvanPay — Admin Sandbox</title>
+<style>body{font:16px system-ui;background:#101827;color:#e8eefc;max-width:780px;margin:40px auto;padding:20px}section{background:#17233a;padding:22px;border-radius:12px;margin:14px 0}button,input{font:inherit;padding:12px;border-radius:7px;border:1px solid #63708c;margin:5px}button{background:#3678ec;color:white;cursor:pointer}input{width:160px}pre{white-space:pre-wrap;overflow-wrap:anywhere}a{color:#8dc1ff}strong{color:#ffc271}</style></head><body>
+<h1>Paytm Sandbox — Admin Only</h1>
+<p><strong>STAGING ONLY. No customer payment, merchant credit, settlement or subscription approval.</strong></p>
+<p>Login to <a href="/admin-login.html">Admin Portal</a> first. Requires PAYTM_SANDBOX_ENABLED=true and TEST credentials on the server.</p>
+<section><label>Test amount INR <input id="amount" value="1.00" inputmode="decimal"></label>
+<button id="start">Create STAGING Order</button><button id="status" disabled>Check signed Paytm status</button>
+<p id="message" role="status">No test order initiated.</p><pre id="result"></pre></section>
+<script>
+const token=localStorage.getItem('adminToken');if(!token)location.replace('/admin-login.html');
+let active=null;const message=document.getElementById('message'),result=document.getElementById('result');
+async function call(path, data){const response=await fetch(path,{method:path.endsWith('/initiate')?'POST':'GET',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},...(data?{body:JSON.stringify(data)}:{})});const payload=await response.json();if(!response.ok||!payload.status)throw new Error(payload.message||payload.code||'Request failed');return payload.order}
+document.getElementById('start').onclick=async()=>{
+  document.getElementById('start').disabled=true;document.getElementById('status').disabled=true;message.textContent='Calling Paytm STAGING...';result.textContent='';
+  try{
+    active=await call('/admin-api/paytm-sandbox/initiate',{amount:document.getElementById('amount').value});
+    message.textContent='STAGING order created. Paytm sandbox checkout loading...';
+    result.textContent='Order ID: '+active.order_id+' | Amount: '+active.amount+' INR';
+    document.getElementById('status').disabled=false;
+    const url=new URL(active.checkout_script);
+    if(url.origin!=='https://securegw-stage.paytm.in'||!/^\/merchantpgpui\/checkoutjs\/merchants\/[A-Za-z0-9_-]{6,64}\.js$/.test(url.pathname))throw new Error('Invalid sandbox checkout script URL');
+    const s=document.createElement('script');s.src=url.href;s.crossOrigin='anonymous';
+    s.onload=()=>{
+      if(!window.Paytm?.CheckoutJS) {message.textContent='Staging checkout unavailable';return}
+      window.Paytm.CheckoutJS.onLoad(()=>window.Paytm.CheckoutJS.init({root:'',flow:'DEFAULT',data:{orderId:active.order_id,token:active.txn_token,tokenType:'TXN_TOKEN',amount:active.amount},handler:{notifyMerchant:()=>{message.textContent='Checkout event received; verify order status separately.'}}}).then(()=>window.Paytm.CheckoutJS.invoke()).catch(()=>{message.textContent='Checkout initialization failed';}));
+    };
+    s.onerror=()=>{message.textContent='Cannot load Paytm staging checkout JS';};document.head.append(s);
+  }catch(e){message.textContent=e.message}finally{document.getElementById('start').disabled=false}
+};
+document.getElementById('status').onclick=async()=>{if(!active)return;message.textContent='Checking signed Paytm staging status...';try{const x=await call('/admin-api/paytm-sandbox/status/'+encodeURIComponent(active.order_id));message.textContent=x.state+' (no financial credit)';}catch(e){message.textContent=e.message}};
+</script></body></html>
